@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Education and Projects API</title>
+</head>
+<body>
+    <h1>Test Education and Projects API</h1>
+    
+    <div>
+        <h2>Test Education API</h2>
+        <button onclick="testEducationAPI()">Test Add Education</button>
+        <div id="education-result"></div>
+    </div>
+    
+    <div>
+        <h2>Test Projects API</h2>
+        <button onclick="testProjectAPI()">Test Add Project</button>
+        <div id="project-result"></div>
+    </div>
+    
+    <script>
+        // Test education API
+        async function testEducationAPI() {
+            const data = {
+                institution_name: "Test University",
+                degree_type: "Bachelor of Science",
+                field_of_study: "Computer Science",
+                graduation_date: "2020-05-15T00:00:00Z",
+                gpa: 3.8,
+                location: "Test City, ST"
+            };
+            
+            try {
+                const response = await fetch('/api/v2/master-dataset/education', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                document.getElementById('education-result').innerHTML = 
+                    `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('education-result').innerHTML = 
+                    `<pre>Error: ${error.message}</pre>`;
+            }
+        }
+        
+        // Test project API
+        async function testProjectAPI() {
+            const data = {
+                project_name: "Test Project",
+                project_type: "Web Application",
+                project_description: "A test project for API validation",
+                start_date: "2023-01-01T00:00:00Z",
+                end_date: "2023-12-31T00:00:00Z",
+                technologies_used: "JavaScript, HTML, CSS"
+            };
+            
+            try {
+                const response = await fetch('/api/v2/master-dataset/project', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                document.getElementById('project-result').innerHTML = 
+                    `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('project-result').innerHTML = 
+                    `<pre>Error: ${error.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html>

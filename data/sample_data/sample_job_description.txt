@@ -1,0 +1,75 @@
+Product Manager - EdTech Platform
+
+Company: EduInnovate Solutions
+Location: San Francisco, CA (Remote Friendly)
+Job Type: Full-Time
+Experience Level: Mid-Level (2-5 years)
+
+About Us:
+EduInnovate Solutions is a leading educational technology company focused on transforming K-12 learning experiences through innovative digital platforms. We serve over 500,000 students, teachers, and parents across North America with our comprehensive learning management and assessment tools.
+
+What You'll Be Doing:
+
+• Deeply understand and advocate for the needs of our student, teacher, and parent users
+• Gather requirements and clarify goals for new projects 
+• Consider user needs and product strategy to make feature design decisions
+• Produce clear written specifications for all feature functionality and user flows
+• Collaborate with visual designers to create innovative, clean user interfaces
+• Work with engineers to align technical designs and decisions with product needs
+• Do whatever it takes to develop features and deliver value to our users
+• Conduct user research and usability testing to validate product hypotheses
+• Analyze product metrics and KPIs to drive data-informed decision making
+• Manage product roadmap and prioritize feature development based on user impact
+• Coordinate cross-functional teams including engineering, design, marketing, and customer success
+• Present product updates and strategic recommendations to executive leadership
+
+What We're Looking For:
+
+Required Qualifications:
+• Bachelor's degree in STEM or a related field
+• Demonstrated technical abilities; some coursework or experience in computer programming and web technologies is preferred
+• Highly developed analytical-reasoning and problem-solving skills, with proven success applying them independently
+• Strong written and spoken communication skills, with an eye to clarity and conciseness
+• Strong interpersonal skills and ability to work across teams to make things happen
+• Enthusiasm for tackling tough problems independently, from assessing high-level goals through to perfecting every detail
+• Exceptionally organized self-starter, efficient and thrives under pressure
+• Curiosity, open-mindedness, and an unfailingly positive attitude
+
+Preferred Qualifications:
+• Interest in design thinking; some coursework or experience in UI/UX design is helpful
+• Interest in K-12 education! Classroom/teaching experience is a plus
+• Experience with agile development methodologies and product management tools
+• Data analysis experience with tools like SQL, Python, or R
+• Previous experience in EdTech, SaaS, or consumer technology products
+• MBA or advanced degree in business, engineering, or related field
+
+Key Skills & Technologies:
+• Product Management
+• User Experience Design
+• Data Analysis
+• Cross-functional Collaboration
+• Requirements Gathering
+• Technical Communication
+• Project Management
+• Agile/Scrum Methodologies
+• User Research
+• A/B Testing
+• SQL
+• Python (preferred)
+• Jira/Confluence
+• Figma/Sketch
+• Google Analytics
+
+What We Offer:
+• Competitive salary ($90,000 - $130,000) plus equity
+• Comprehensive health, dental, and vision insurance
+• Flexible work arrangements and remote work options
+• Professional development budget ($2,000 annually)
+• Opportunity to impact millions of students' educational journeys
+• Collaborative, mission-driven team culture
+• Generous PTO and parental leave policies
+
+Application Process:
+Please submit your resume, cover letter, and a brief portfolio showcasing your product management experience. Include examples of how you've successfully collaborated with engineering and design teams to deliver user-centered products.
+
+EduInnovate Solutions is an equal opportunity employer committed to diversity and inclusion.

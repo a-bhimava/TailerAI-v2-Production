@@ -1,0 +1,77 @@
+{
+  "summary": {
+    "total_tests": 11,
+    "passed_tests": 6,
+    "failed_tests": 5,
+    "success_rate": "54.5%",
+    "test_run_time": "2025-06-27T15:53:35.785803"
+  },
+  "test_results": [
+    {
+      "test": "Get User Profile",
+      "passed": false,
+      "details": "Instance <UserProfile at 0x107986690> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)",
+      "timestamp": "2025-06-27T15:53:35.767317"
+    },
+    {
+      "test": "Add Work Experience",
+      "passed": false,
+      "details": "Instance <WorkExperience at 0x107973490> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)",
+      "timestamp": "2025-06-27T15:53:35.770012"
+    },
+    {
+      "test": "Achievement Operations Setup",
+      "passed": false,
+      "details": "No work experience available",
+      "timestamp": "2025-06-27T15:53:35.770020"
+    },
+    {
+      "test": "Add Skill",
+      "passed": false,
+      "details": "Instance <Skill at 0x1079a3ed0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)",
+      "timestamp": "2025-06-27T15:53:35.773208"
+    },
+    {
+      "test": "Get Dataset Summary",
+      "passed": true,
+      "details": "Summary contains 5 sections",
+      "timestamp": "2025-06-27T15:53:35.782732"
+    },
+    {
+      "test": "Summary Completeness",
+      "passed": false,
+      "details": "Missing: ['profile', 'work_experiences', 'achievements', 'skills']",
+      "timestamp": "2025-06-27T15:53:35.782739"
+    },
+    {
+      "test": "Dataset Validation",
+      "passed": true,
+      "details": "Validation completed",
+      "timestamp": "2025-06-27T15:53:35.784672"
+    },
+    {
+      "test": "Completeness Score",
+      "passed": true,
+      "details": "Score: 40",
+      "timestamp": "2025-06-27T15:53:35.784676"
+    },
+    {
+      "test": "Invalid User ID Handling",
+      "passed": true,
+      "details": "Correctly handled invalid UUID",
+      "timestamp": "2025-06-27T15:53:35.784724"
+    },
+    {
+      "test": "Non-existent User Handling",
+      "passed": true,
+      "details": "Returned None for non-existent user",
+      "timestamp": "2025-06-27T15:53:35.785034"
+    },
+    {
+      "test": "Data Validation",
+      "passed": true,
+      "details": "Correctly rejected invalid data",
+      "timestamp": "2025-06-27T15:53:35.785654"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "total_tests": 13,
+    "passed_tests": 7,
+    "failed_tests": 6,
+    "success_rate": "53.8%",
+    "test_run_time": "2025-06-27T15:51:47.057693"
+  },
+  "test_results": [
+    {
+      "test": "User Registration",
+      "passed": true,
+      "details": "Registration successful (session detached)",
+      "timestamp": "2025-06-27T15:51:46.107092"
+    },
+    {
+      "test": "Duplicate Email Prevention",
+      "passed": true,
+      "details": "Correctly rejected duplicate email",
+      "timestamp": "2025-06-27T15:51:46.107578"
+    },
+    {
+      "test": "Password Strength Validation",
+      "passed": true,
+      "details": "Correctly rejected weak password",
+      "timestamp": "2025-06-27T15:51:46.107597"
+    },
+    {
+      "test": "Successful Login",
+      "passed": true,
+      "details": "Access and refresh tokens generated",
+      "timestamp": "2025-06-27T15:51:46.344724"
+    },
+    {
+      "test": "Invalid Password Protection",
+      "passed": false,
+      "details": "Unexpected error: Unexpected database error: Invalid email or password",
+      "timestamp": "2025-06-27T15:51:46.580853"
+    },
+    {
+      "test": "Non-existent User Protection",
+      "passed": false,
+      "details": "Unexpected error: Unexpected database error: Invalid email or password",
+      "timestamp": "2025-06-27T15:51:46.581384"
+    },
+    {
+      "test": "Valid Token Validation",
+      "passed": false,
+      "details": "Authentication failed",
+      "timestamp": "2025-06-27T15:51:46.581562"
+    },
+    {
+      "test": "Invalid Token Rejection",
+      "passed": true,
+      "details": "Correctly rejected invalid token",
+      "timestamp": "2025-06-27T15:51:46.581595"
+    },
+    {
+      "test": "Token Refresh",
+      "passed": false,
+      "details": "New token should be different",
+      "timestamp": "2025-06-27T15:51:46.582494"
+    },
+    {
+      "test": "Password Reset Request",
+      "passed": true,
+      "details": "Reset request processed",
+      "timestamp": "2025-06-27T15:51:46.583651"
+    },
+    {
+      "test": "Password Reset Flow",
+      "passed": true,
+      "details": "Reset flow initiated successfully",
+      "timestamp": "2025-06-27T15:51:46.583655"
+    },
+    {
+      "test": "Account Lockout Protection",
+      "passed": false,
+      "details": "Unexpected database error: Invalid email or password",
+      "timestamp": "2025-06-27T15:51:47.056262"
+    },
+    {
+      "test": "User Profile Retrieval",
+      "passed": false,
+      "details": "No profile found - may need to be created manually",
+      "timestamp": "2025-06-27T15:51:47.057618"
+    }
+  ]
+}

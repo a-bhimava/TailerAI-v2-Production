@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TailerAI v2.0 Frontend Testing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ddd; margin: 10px 0; padding: 15px; }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>TailerAI v2.0 Frontend Testing</h1>
+    <div id="test-results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8002/api/v2';
+        const resultsDiv = document.getElementById('test-results');
+
+        function addResult(testName, status, message) {
+            const div = document.createElement('div');
+            div.className = 'test-section';
+            div.innerHTML = `
+                <h3>${testName}</h3>
+                <p class="${status}">${message}</p>
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        async function testFrontend() {
+            addResult('Starting Tests', 'loading', 'Testing TailerAI v2.0 Phase 1 interfaces...');
+
+            // Test 1: Check if main page is accessible
+            try {
+                const response = await fetch('http://localhost:8002/');
+                if (response.ok) {
+                    addResult('Main Page Load', 'success', 'Main page loads successfully');
+                } else {
+                    addResult('Main Page Load', 'error', `Failed to load main page: ${response.status}`);
+                }
+            } catch (error) {
+                addResult('Main Page Load', 'error', `Main page error: ${error.message}`);
+            }
+
+            // Test 2: Check API health
+            try {
+                const response = await fetch('http://localhost:8002/health');
+                const health = await response.json();
+                if (health.status === 'degraded' || health.status === 'healthy') {
+                    addResult('API Health Check', 'success', `API is ${health.status}. Services: ${JSON.stringify(health.services)}`);
+                } else {
+                    addResult('API Health Check', 'error', `API health issue: ${health.status}`);
+                }
+            } catch (error) {
+                addResult('API Health Check', 'error', `API health error: ${error.message}`);
+            }
+
+            // Test 3: Check if static files load
+            try {
+                const cssResponse = await fetch('http://localhost:8002/static/css/components.css');
+                const jsResponse = await fetch('http://localhost:8002/static/js/api.js');
+                
+                if (cssResponse.ok && jsResponse.ok) {
+                    addResult('Static Files', 'success', 'CSS and JS files load successfully');
+                } else {
+                    addResult('Static Files', 'error', `CSS: ${cssResponse.status}, JS: ${jsResponse.status}`);
+                }
+            } catch (error) {
+                addResult('Static Files', 'error', `Static files error: ${error.message}`);
+            }
+
+            // Test 4: Test authentication endpoint structure
+            try {
+                const response = await fetch(`${API_BASE}/job-analysis`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ job_text: 'test' })
+                });
+                
+                if (response.status === 403) {
+                    addResult('API Authentication', 'success', 'Job analysis endpoint requires authentication (as expected)');
+                } else {
+                    addResult('API Authentication', 'error', `Unexpected response: ${response.status}`);
+                }
+            } catch (error) {
+                addResult('API Authentication', 'error', `Auth test error: ${error.message}`);
+            }
+
+            addResult('Testing Complete', 'success', 'Frontend testing completed. Check individual results above.');
+        }
+
+        // Run tests when page loads
+        testFrontend();
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{
+  "timestamp": "2025-06-28T07:50:15.387197",
+  "total_tests": 13,
+  "passed_tests": 5,
+  "failed_tests": 8,
+  "issues_found": [
+    {
+      "test": "auth_protected",
+      "message": "Protected endpoint failed: 401",
+      "timestamp": "2025-06-28T07:50:15.926106"
+    },
+    {
+      "test": "master_dataset_profile",
+      "message": "Profile creation failed: 405",
+      "timestamp": "2025-06-28T07:50:15.926879"
+    },
+    {
+      "test": "master_dataset_work_exp",
+      "message": "Work experience creation failed: 404",
+      "timestamp": "2025-06-28T07:50:15.927611"
+    },
+    {
+      "test": "job_analysis",
+      "message": "Job analysis failed: 401",
+      "timestamp": "2025-06-28T07:50:15.928478"
+    },
+    {
+      "test": "quality_assessment",
+      "message": "Quality assessment failed: 401",
+      "timestamp": "2025-06-28T07:50:15.929383"
+    },
+    {
+      "test": "quality_history",
+      "message": "Quality history failed: 401",
+      "timestamp": "2025-06-28T07:50:15.930164"
+    },
+    {
+      "test": "ats_optimization",
+      "message": "ATS optimization failed: 401",
+      "timestamp": "2025-06-28T07:50:15.930944"
+    },
+    {
+      "test": "latex_status",
+      "message": "LaTeX status failed: 404",
+      "timestamp": "2025-06-28T07:50:15.931605"
+    }
+  ],
+  "endpoint_coverage": {
+    "docs_accessible": {
+      "passed": true,
+      "message": "OpenAPI docs accessible"
+    },
+    "health_endpoint": {
+      "passed": true,
+      "message": "Health check passed: degraded"
+    },
+    "auth_register": {
+      "passed": true,
+      "message": "User registration successful"
+    },
+    "auth_login": {
+      "passed": true,
+      "message": "User login successful"
+    },
+    "auth_protected": {
+      "passed": false,
+      "message": "Protected endpoint failed: 401"
+    },
+    "master_dataset_profile": {
+      "passed": false,
+      "message": "Profile creation failed: 405"
+    },
+    "master_dataset_work_exp": {
+      "passed": false,
+      "message": "Work experience creation failed: 404"
+    },
+    "job_analysis": {
+      "passed": false,
+      "message": "Job analysis failed: 401"
+    },
+    "quality_assessment": {
+      "passed": false,
+      "message": "Quality assessment failed: 401"
+    },
+    "quality_history": {
+      "passed": false,
+      "message": "Quality history failed: 401"
+    },
+    "ats_optimization": {
+      "passed": false,
+      "message": "ATS optimization failed: 401"
+    },
+    "latex_status": {
+      "passed": false,
+      "message": "LaTeX status failed: 404"
+    },
+    "naming_conventions": {
+      "passed": true,
+      "message": "All endpoints follow naming conventions"
+    }
+  },
+  "naming_conventions": {
+    "issues": [],
+    "compliant": [
+      "/api/v2/auth/register",
+      "/api/v2/auth/login",
+      "/api/v2/auth/me",
+      "/api/v2/master-dataset/profile",
+      "/api/v2/master-dataset/work-experiences",
+      "/api/v2/quality/assess",
+      "/api/v2/quality/history",
+      "/api/v2/ats/optimize",
+      "/api/v2/latex/status"
+    ]
+  },
+  "response_consistency": {
+    "issues": [],
+    "compliant": []
+  },
+  "summary": {
+    "success_rate": "38.5%",
+    "total_endpoints_tested": 13,
+    "critical_issues": 0,
+    "naming_convention_compliance": 100.0
+  }
+}

@@ -1,0 +1,122 @@
+% Ultra-compact, high-density resume with section lines, matching Aditya_Resume_CMU_June.pdf
+\documentclass[10pt,letterpaper]{article}
+\usepackage[left=0.5in, right=0.5in, top=0.5in, bottom=0.3in]{geometry}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tikz}
+
+% Remove page numbers
+\pagestyle{empty}
+
+% Section formatting (tighter)
+\titleformat{\section}{\bfseries\uppercase}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{0.5ex}{0.2ex}
+
+% Custom entry command
+\newcommand{\resumeEntry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}Xr@{}}
+    \textbf{#1} #2 & #3 \\
+    \textit{#4} & \\
+  \end{tabularx}
+}
+
+% Bullet formatting (flush left)
+\setlist[itemize]{left=0em, itemsep=0.1em, topsep=0.1em, parsep=0em, partopsep=0em}
+
+% Reduce line spacing globally
+\linespread{0.97}
+\setlength{\parskip}{0em}
+
+% Horizontal rule command (force paragraph break)
+\newcommand{\sectionline}{\par\vspace{-0.5em}\noindent\rule{\textwidth}{0.6pt}\vspace{0.3em}\par}
+
+\begin{document}
+
+% Header
+\begin{center}
+  {\LARGE \textbf{ADITYA TEJA BHIMAVARAPU}}\\
+  412.287.1018 $|$ abhimava@andrew.cmu.edu $|$ linkedin.com/in/aditya-teja $|$ Pittsburgh, PA
+\end{center}
+\vspace{0.5em}
+
+% Education
+\section*{EDUCATION}
+% No line above EDUCATION
+
+% CMU
+\noindent\textbf{CARNEGIE MELLON UNIVERSITY, TEPPER SCHOOL OF BUSINESS} \hfill Pittsburgh, PA\\
+\textit{Master of Science in Product Management - MSPM} \hfill 12/25
+\begin{itemize}
+  \item Selected Coursework: Principles of Prod. Mgmt., Design of AI Products, Data Science for Product Managers.
+\end{itemize}
+
+% IIM
+\noindent\textbf{INDIAN INSTITUTE OF MANAGEMENT} \hfill Sambalpur, India\\
+\textit{Master of Business Administration, Strategy \& Finance -- MBA, GPA: 7.8/10} \hfill 03/23
+\begin{itemize}
+  \item Selected Coursework: Marketing Research, Brand Management, Consumer Behavior, Data Visualization.
+  \item Awards: Best Rated Intern at Galderma, National Finalist in Unilever's TechFest Case Competition, Top 200 in Tata Imagination Challenge out of 85k participants, a total of 11 case competition accolades across 2 years
+\end{itemize}
+
+% Mahindra Univ
+\noindent\textbf{ECOLE CENTRALE SCHOOL OF ENGINEERING, MAHINDRA UNIVERSITY} \hfill Hyderabad, India\\
+\textit{Bachelor of Technology, Mechanical Engineering -- (B. Tech), GPA: 7.8/10} \hfill 09/20
+\begin{itemize}
+  \item Awards (Robotics): World Top 15 teams in Singapore Autonomous Underwater Vehicle Competition
+\end{itemize}
+
+% Work Experience
+\section*{WORK EXPERIENCE}
+\sectionline
+
+% ICICI BANK
+\noindent\textbf{ICICI BANK (Top 15 Bank by Market Cap)} \hfill Hyderabad, India\\
+\textit{Manager -- Corporate Banking} \hfill 04/23 -- 11/24
+\begin{itemize}
+  \item Customer Focus: Managed a portfolio valued at \$650M comprising of 45 multinational corporations, including Fortune 20 companies in automotive, manufacturing, and semiconductor sectors by effectively aligning service to client needs, resulting in annual revenue of \$7M. Increased portfolio by \$185M in FY 2024.
+  \item Product Management: Owned end-to-end implementation of tool that parsed client financial documents from 60+ languages, converted other currencies to Indian Rupees and auto filled in proprietary Excel Model. Coordinated across internal divisions and led team. This solution reduced turnaround time by 25%.
+  \item Problem Solving: Initiated a multi-country taskforce, creating a sales funnel strategy of partnering with foreign companies before their India entry, by clearly identifying and mapping client touchpoints. Scaled to onboard 15 Fortune 500 companies (Micron, Foxconn) in year 1 growing portfolio by \$190M in FY 2024.
+  \item Communication \& Impactful Presentations: Delivered 26 C-Suite business presentations, effectively influencing strategic decisions with clear insights on portfolio growth.
+\end{itemize}
+
+% GALDERMA
+\noindent\textbf{GALDERMA (\#1 Independent Skin Care Company)} \hfill Mumbai, India\\
+\textit{Marketing Intern -- Acne Category} \hfill 04/22 -- 07/22
+\begin{itemize}
+  \item Market Research: Performed a deep-dive analysis of acne market by conducting 900 interviews and 10 focus groups resulting in crucial insights about the purchase drivers and impact of sales channel on willingness to pay.
+  \item Marketing Strategy: Helped formulate positioning and communication strategy for 4 acne care products -- cleansers, face wash and moisturizer based on consumer preferences based on primary \& secondary research.
+  \item Product Launch: Launched campaign for face cleanser, wash, and moisturizer by benchmarking product to establish positioning. Resulted market share of 2-3.5% in first year of launch.
+  \item Business Process Automation: Ideated and delivered a Python program to verify discount codes for various product combinations by collaborating with supply chain team. Reduced the reconciliation time by 3600%.
+\end{itemize}
+
+% CAPGEMINI
+\noindent\textbf{CAPGEMINI} \hfill Pune, India\\
+\textit{Senior Analyst} \hfill 10/20 -- 10/21
+\begin{itemize}
+  \item Big Data Development: Contributed to development of data warehouse to predict credit card default probability by using fine-tuned gradient boosting model implemented on Apache Spark improving the model accuracy by 3%.
+  \item Business Process Automation: Developed program in PySpark to streamline and semi-automate code documentation, making it more intuitive for users and saving over 1K man-hours annually per team.
+\end{itemize}
+Programming Experience: SQL, Python, Java, Scala; Tools: Excel, Oracle 8, Apache Hive, Spark, ETL tools like Ab Initio
+
+% Project Experience
+\section*{PROJECT EXPERIENCE}
+\sectionline
+
+\begin{itemize}
+  \item Flipkart (Walmart Group) Sales Analytics -- Used ETL Tools to cleanse sales data and analyze using Apache Spark. Presented insights on best-selling, best-rated categories, seasonality \& other statistical analysis.
+  \item Unilever's Auto-Order Device -- Ideated an affordable IoT based solution for Unilever that auto-orders groceries as they reach a threshold. Lead a team of four for development, implemented Go-to-market strategy \& pilot tests. Top 4 National Finalist in Unilever's TechFest Case Competition
+\end{itemize}
+
+% Additional Information
+\section*{ADDITIONAL INFORMATION}
+\sectionline
+
+\begin{itemize}
+  \item Certifications: CRISIL Financial Statement Analysis, Google Data Analytics, Product Management Essentials, UofM, KPMG Six Sigma Green Belt, Data Engineering Practitioner Certificate by Capgemini.
+  \item Patent Pending: System and Method for Human-to-Human and Human-to-AI Knowledge Transfer Using Predictive Risk Assessment and Multi-dimensional Capture Technologies
+\end{itemize}
+
+\end{document} 

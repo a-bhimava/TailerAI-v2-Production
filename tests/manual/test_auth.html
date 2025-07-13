@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <button onclick="testGoogleAuth()">Test Google Auth (Dummy)</button>
+    <button onclick="testMasterDataset()">Test Master Dataset</button>
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8002';
+        
+        async function testGoogleAuth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing Google Auth...';
+            
+            try {
+                // This would normally be a real Google JWT token
+                const dummyGoogleToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjdkYzBiMGIwOGNhZGNjMzQ1YjVkZGM2N2E1YWY4MDc5NTU0NzNkZGEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTAwODg5OTM4NTA2OS1yanBsY3FkNXEybWw2NTA0ZjVlcG1kNzIwdXRoOXRtZS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6IjEwMDg4OTkzODUwNjktcmpwbGNxZDVxMm1sNjUwNGY1ZXBtZDcyMHV0aDl0bWUuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDAwMDAwMDAwMDAwMDAwMDAiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IlRlc3RIYXNoIiwibmFtZSI6IlRlc3QgVXNlciIsInBpY3R1cmUiOiJodHRwczovL2V4YW1wbGUuY29tL3BpYy5qcGciLCJnaXZlbl9uYW1lIjoiVGVzdCIsImZhbWlseV9uYW1lIjoiVXNlciIsImxvY2FsZSI6ImVuIiwiaWF0IjoxNzIwMDE2MDAwLCJleHAiOjE3MjAwMTk2MDB9.dummysignature';
+                
+                const response = await fetch(`${API_BASE}/api/v2/auth/google`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        google_token: dummyGoogleToken
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = 'Google Auth Success! Token: ' + result.access_token?.substring(0, 50) + '...';
+                    localStorage.setItem('access_token', result.access_token);
+                } else {
+                    resultDiv.innerHTML = 'Google Auth Failed: ' + JSON.stringify(result);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testMasterDataset() {
+            const resultDiv = document.getElementById('result');
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                resultDiv.innerHTML = 'No token found. Please authenticate first.';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Testing Master Dataset...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/v2/master-dataset/`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = 'Master Dataset Success: ' + JSON.stringify(result, null, 2);
+                } else {
+                    resultDiv.innerHTML = 'Master Dataset Failed (' + response.status + '): ' + JSON.stringify(result);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

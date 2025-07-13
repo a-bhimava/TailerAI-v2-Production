@@ -1,0 +1,420 @@
+/* Responsive Design for TailerAI v2.0 */
+
+/* =============================================================================
+   MOBILE FIRST APPROACH
+   ============================================================================= */
+
+/* Extra Small Devices (phones, less than 640px) */
+@media (max-width: 639px) {
+    .app-shell {
+        grid-template-areas: 
+            "header"
+            "main"
+            "status";
+        grid-template-columns: 1fr;
+        grid-template-rows: var(--header-height) 1fr var(--status-bar-height);
+    }
+
+    .app-sidebar {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        width: 100%;
+        height: calc(100vh - var(--header-height) - var(--status-bar-height));
+        z-index: var(--z-dropdown);
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+        grid-area: unset;
+    }
+
+    .app-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        width: 100%;
+        height: calc(100vh - var(--header-height) - var(--status-bar-height));
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: calc(var(--z-dropdown) - 1);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--transition-normal);
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .header-center {
+        display: none;
+    }
+
+    .app-logo h1 {
+        font-size: var(--font-size-lg);
+    }
+
+    .app-subtitle {
+        display: none;
+    }
+
+    .view {
+        padding: var(--space-4);
+    }
+
+    .page-header h2 {
+        font-size: var(--font-size-2xl);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+
+    .search-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        min-width: unset;
+    }
+
+    .filter-controls {
+        justify-content: space-between;
+    }
+
+    .page-actions {
+        flex-direction: column;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: var(--space-4);
+    }
+
+    .notifications-container {
+        top: calc(var(--header-height) + var(--space-2));
+        right: var(--space-2);
+        left: var(--space-2);
+        max-width: unset;
+    }
+
+    .status-bar {
+        padding: 0 var(--space-4);
+    }
+
+    .status-left,
+    .status-right {
+        font-size: var(--font-size-xs);
+    }
+
+    .status-right {
+        display: none;
+    }
+}
+
+/* Small Devices (large phones, 640px and up) */
+@media (min-width: 640px) and (max-width: 767px) {
+    .app-shell {
+        grid-template-columns: var(--sidebar-collapsed-width) 1fr;
+    }
+
+    .nav-text {
+        display: none;
+    }
+
+    .nav-link {
+        justify-content: center;
+        padding: var(--space-3);
+    }
+
+    .sidebar-content {
+        padding: var(--space-6) var(--space-2);
+    }
+
+    .header-center {
+        display: flex;
+    }
+
+    .breadcrumb {
+        font-size: var(--font-size-xs);
+    }
+
+    .view {
+        padding: var(--space-6);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .search-filter-bar {
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        min-width: 250px;
+        flex: 1 1 250px;
+    }
+}
+
+/* Medium Devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .search-filter-bar {
+        flex-wrap: nowrap;
+    }
+
+    .search-box {
+        min-width: 300px;
+    }
+}
+
+/* Large Devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .view {
+        padding: var(--space-8);
+    }
+}
+
+/* Extra Large Devices (large desktops, 1280px and up) */
+@media (min-width: 1280px) {
+    .view {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--space-8) var(--space-12);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* =============================================================================
+   LANDSCAPE ORIENTATION ADJUSTMENTS
+   ============================================================================= */
+
+@media (orientation: landscape) and (max-height: 600px) {
+    .view {
+        padding: var(--space-4);
+    }
+
+    .page-header {
+        margin-bottom: var(--space-4);
+    }
+
+    .page-header h2 {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--space-1);
+    }
+
+    .page-header p {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--space-3);
+    }
+
+    .dashboard-grid {
+        gap: var(--space-4);
+    }
+
+    .dashboard-card {
+        padding: var(--space-4);
+    }
+}
+
+/* =============================================================================
+   HIGH DPI DISPLAYS
+   ============================================================================= */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .loading-spinner {
+        border-width: 2px;
+    }
+
+    .progress-bar {
+        height: 6px;
+    }
+
+    .status-indicator {
+        width: 6px;
+        height: 6px;
+    }
+}
+
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
+
+@media print {
+    .app-header,
+    .app-sidebar,
+    .status-bar,
+    .notifications-container {
+        display: none !important;
+    }
+
+    .app-shell {
+        grid-template-areas: "main";
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    .view {
+        padding: 0;
+        box-shadow: none;
+        border: none;
+    }
+
+    .page-header {
+        margin-bottom: var(--space-4);
+    }
+
+    .dashboard-card,
+    .card {
+        box-shadow: none;
+        border: 1px solid var(--border-primary);
+        break-inside: avoid;
+    }
+
+    .btn {
+        display: none;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .view {
+        transform: none !important;
+    }
+
+    .modal-content {
+        transform: none !important;
+    }
+
+    .notification {
+        transform: none !important;
+    }
+
+    .loading-spinner {
+        animation: none;
+        border-top-color: var(--accent-primary);
+    }
+}
+
+/* =============================================================================
+   CONTAINER QUERIES (Future Enhancement)
+   ============================================================================= */
+
+/* When container queries are widely supported, these can be used for more granular responsive design */
+
+/* @container sidebar (max-width: 200px) {
+    .nav-text {
+        display: none;
+    }
+    
+    .nav-link {
+        justify-content: center;
+    }
+} */
+
+/* =============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================= */
+
+/* Increase spacing for easier touch targets on mobile */
+@media (max-width: 767px) {
+    .btn {
+        min-height: 44px;
+        padding: var(--space-3) var(--space-6);
+    }
+
+    .nav-link {
+        min-height: 44px;
+        padding: var(--space-4);
+    }
+
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    .sidebar-toggle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .modal-close {
+        width: 44px;
+        height: 44px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        min-height: 44px;
+        padding: var(--space-3) var(--space-4);
+    }
+}
+
+/* Focus indicators for keyboard navigation */
+@media (hover: none) and (pointer: coarse) {
+    .btn:focus,
+    .nav-link:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: 3px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
+}
+
+/* Enhanced contrast for better readability */
+@media (prefers-contrast: high) {
+    .btn-outline {
+        border-width: 2px;
+    }
+
+    .card,
+    .dashboard-card {
+        border-width: 2px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        border-width: 2px;
+    }
+
+    .nav-link.active {
+        outline: 2px solid var(--text-inverse);
+        outline-offset: -2px;
+    }
+}
