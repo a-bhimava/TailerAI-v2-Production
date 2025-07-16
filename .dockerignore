@@ -1,0 +1,93 @@
+# .dockerignore for TailerAI v2.0 - Google Cloud Run optimization
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git files
+.git
+.gitignore
+.gitkeep
+
+# Documentation
+*.md
+docs/
+README.md
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+logs/*.log
+logs/*.txt
+
+# Data directories (exclude user data)
+data/cache/*
+data/uploads/*
+data/generated/*.pdf
+data/generated/*.tex
+data/generated/*.aux
+data/generated/*.log
+data/generated/*.synctex.gz
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# CI/CD files
+.github/
+.circleci/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Deployment files
+deploy/
+k8s/
+kubernetes/
+helm/
+
+# Local development
+node_modules/
+npm-debug.log
+yarn-error.log
