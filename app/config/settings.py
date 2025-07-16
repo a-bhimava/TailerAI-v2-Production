@@ -91,8 +91,8 @@ class Settings(BaseSettings):
     auto_reanalyze_trigger_count: int = Field(default=3, env="AUTO_REANALYZE_TRIGGER_COUNT")
     
     # LaTeX settings
-    latex_engine: str = Field(default="pdflatex", env="LATEX_ENGINE")
-    latex_engine_path: str = Field(default="/Library/TeX/texbin/pdflatex", env="LATEX_ENGINE_PATH")
+    latex_engine: str = Field(default="tectonic", env="LATEX_ENGINE")
+    latex_engine_path: str = Field(default="tectonic", env="LATEX_ENGINE_PATH")
     tex_live_path: str = Field(default="/usr/local/texlive", env="TEX_LIVE_PATH")
     
     # File storage settings
@@ -153,11 +153,17 @@ class Settings(BaseSettings):
             Path(directory).mkdir(parents=True, exist_ok=True)
     
     def _validate_latex_setup(self):
-        """Validate LaTeX installation"""
+        """Validate Tectonic LaTeX engine installation"""
         if self.environment == "production":
-            latex_path = Path(self.latex_engine_path)
-            if not latex_path.exists():
-                print(f"Warning: LaTeX engine not found at {self.latex_engine_path}")
+            import subprocess
+            try:
+                # Test if tectonic is available in PATH
+                result = subprocess.run(['tectonic', '--version'], 
+                                      capture_output=True, text=True, timeout=5)
+                if result.returncode != 0:
+                    print(f"Warning: Tectonic LaTeX engine not available")
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                print(f"Warning: Tectonic LaTeX engine not found in PATH")
     
     @property
     def DEBUG(self) -> bool:

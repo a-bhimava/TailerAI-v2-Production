@@ -153,12 +153,66 @@ class ContentSelectionEngine:
                 if not profile:
                     raise ContentSelectionError(f"User profile not found: {user_profile_id}")
                 
-                # Load all related data
+                # Load all related data and ensure they're fully loaded within the session
                 work_experiences = session.query(WorkExperience).filter_by(profile_id=user_profile_id).all()
                 achievements = session.query(Achievement).filter_by(profile_id=user_profile_id).all()
                 skills = session.query(Skill).filter_by(profile_id=user_profile_id).all()
                 education = session.query(EducationEntry).filter_by(profile_id=user_profile_id).all()
                 projects = session.query(Project).filter_by(profile_id=user_profile_id).all()
+                
+                # Force load all attributes that might be accessed later to avoid lazy loading issues
+                for achievement in achievements:
+                    # Access all attributes to trigger loading while session is active
+                    _ = achievement.id
+                    _ = achievement.achievement_text
+                    _ = achievement.skills_demonstrated
+                    _ = achievement.quantified_metrics
+                    _ = achievement.achievement_category
+                    _ = achievement.impact_level
+                    _ = achievement.created_at
+                    _ = achievement.experience_id
+                
+                for work_exp in work_experiences:
+                    _ = work_exp.id
+                    _ = work_exp.position_title
+                    _ = work_exp.company_name
+                    _ = work_exp.role_summary
+                    _ = work_exp.industry
+                    _ = work_exp.team_size
+                    _ = work_exp.start_date
+                    _ = work_exp.end_date
+                
+                for skill in skills:
+                    _ = skill.id
+                    _ = skill.skill_name
+                    _ = skill.proficiency_level
+                    _ = skill.skill_category
+                    _ = skill.years_experience
+                
+                for proj in projects:
+                    _ = proj.id
+                    _ = proj.project_name
+                    _ = proj.project_description
+                    _ = proj.technologies_used
+                    _ = proj.metrics
+                    _ = proj.role
+                    _ = proj.project_url
+                    _ = proj.repository_url
+                    _ = proj.team_size
+                    _ = proj.start_date
+                    _ = proj.end_date
+                
+                for edu in education:
+                    _ = edu.id
+                    _ = edu.institution_name
+                    _ = edu.degree_type
+                    _ = edu.field_of_study
+                    _ = edu.start_date
+                    _ = edu.end_date
+                    _ = edu.gpa
+                
+                # Expunge all objects from session to avoid lazy loading issues
+                session.expunge_all()
                 
                 return {
                     "profile": profile,
@@ -898,10 +952,10 @@ class ContentSelectionEngine:
             # Group achievements by work experience
             work_experiences = {}
             for achievement in achievements:
-                exp_id = str(achievement.work_experience_id)
+                exp_id = str(achievement.experience_id)
                 if exp_id not in work_experiences:
                     work_experience = session.query(WorkExperience).filter_by(
-                        id=achievement.work_experience_id
+                        id=achievement.experience_id
                     ).first()
                     work_experiences[exp_id] = {
                         'experience': work_experience,
@@ -950,10 +1004,10 @@ class ContentSelectionEngine:
             # Group by work experience
             work_experiences = {}
             for achievement in achievements:
-                exp_id = str(achievement.work_experience_id)
+                exp_id = str(achievement.experience_id)
                 if exp_id not in work_experiences:
                     work_experience = session.query(WorkExperience).filter_by(
-                        id=achievement.work_experience_id
+                        id=achievement.experience_id
                     ).first()
                     work_experiences[exp_id] = {
                         'experience': work_experience,

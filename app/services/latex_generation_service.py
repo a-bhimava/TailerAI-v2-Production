@@ -483,7 +483,7 @@ class LaTeXGenerationService:
     
     def _compile_latex_to_pdf(self, latex_content: str, output_filename: str) -> Tuple[bool, str, str]:
         """
-        Compile LaTeX content to PDF using pdflatex.
+        Compile LaTeX content to PDF using Tectonic.
         Returns (success, pdf_path, error_message).
         """
         try:
@@ -496,43 +496,42 @@ class LaTeXGenerationService:
             with open(tex_file, 'w', encoding='utf-8') as f:
                 f.write(latex_content)
             
-            # Compile LaTeX to PDF
-            # Run pdflatex twice to resolve references
-            for attempt in range(2):
-                cmd = ['/Library/TeX/texbin/pdflatex', '-interaction=nonstopmode', f'{output_filename}.tex']
-                self.logger.info(f"========== LATEX COMPILATION ATTEMPT {attempt + 1} ==========")
-                self.logger.info(f"Command: {' '.join(cmd)}")
-                self.logger.info(f"Working directory: {work_dir}")
-                self.logger.info(f"LaTeX file: {tex_file}")
+            # Compile LaTeX to PDF using Tectonic
+            # Tectonic is a modern LaTeX engine that automatically handles packages
+            cmd = ['tectonic', f'{output_filename}.tex']
+            self.logger.info(f"========== LATEX COMPILATION WITH TECTONIC ==========")
+            self.logger.info(f"Command: {' '.join(cmd)}")
+            self.logger.info(f"Working directory: {work_dir}")
+            self.logger.info(f"LaTeX file: {tex_file}")
+            
+            result = subprocess.run(
+                cmd,
+                cwd=work_dir,
+                capture_output=True,
+                text=True,
+                timeout=60  # 60 second timeout for Tectonic
+            )
+            
+            if result.returncode != 0:
+                self.logger.error(f"========== LATEX COMPILATION FAILED ==========")
+                self.logger.error(f"Return code: {result.returncode}")
+                self.logger.error(f"FULL STDERR: {result.stderr}")
+                self.logger.error(f"FULL STDOUT: {result.stdout}")
                 
-                result = subprocess.run(
-                    cmd,
-                    cwd=work_dir,
-                    capture_output=True,
-                    text=True,
-                    timeout=30  # 30 second timeout
-                )
+                # Log the .tex file content for debugging
+                try:
+                    with open(tex_file, 'r') as f:
+                        tex_content = f.read()
+                    self.logger.error(f"LaTeX file content: {tex_content}")
+                except Exception as e:
+                    self.logger.error(f"Could not read .tex file: {e}")
                 
-                if result.returncode != 0:
-                    self.logger.error(f"========== LATEX COMPILATION FAILED ==========")
-                    self.logger.error(f"Return code: {result.returncode}")
-                    self.logger.error(f"FULL STDERR: {result.stderr}")
-                    self.logger.error(f"FULL STDOUT: {result.stdout}")
-                    
-                    # Log the .tex file content for debugging
-                    try:
-                        with open(tex_file, 'r') as f:
-                            tex_content = f.read()
-                        self.logger.error(f"LaTeX file content: {tex_content}")
-                    except Exception as e:
-                        self.logger.error(f"Could not read .tex file: {e}")
-                    
-                    # Return the FULL error instead of parsed version for debugging
-                    full_error_msg = f"LaTeX compilation failed (attempt {attempt + 1}). STDERR: {result.stderr}. STDOUT: {result.stdout}"
-                    
-                    # Clean up
-                    shutil.rmtree(work_dir, ignore_errors=True)
-                    return False, "", full_error_msg
+                # Return the FULL error instead of parsed version for debugging
+                full_error_msg = f"Tectonic compilation failed. STDERR: {result.stderr}. STDOUT: {result.stdout}"
+                
+                # Clean up
+                shutil.rmtree(work_dir, ignore_errors=True)
+                return False, "", full_error_msg
             
             # Check if PDF was created
             pdf_file = work_dir / f"{output_filename}.pdf"
@@ -631,12 +630,12 @@ class LaTeXGenerationService:
     
     async def validate_latex_installation(self) -> Tuple[bool, str]:
         """
-        Validate that LaTeX is properly installed and available.
+        Validate that Tectonic LaTeX engine is properly installed and available.
         Returns (is_available, version_info).
         """
         try:
             result = subprocess.run(
-                ['pdflatex', '--version'],
+                ['tectonic', '--version'],
                 capture_output=True,
                 text=True,
                 timeout=10
@@ -644,17 +643,17 @@ class LaTeXGenerationService:
             
             if result.returncode == 0:
                 version_info = result.stdout.split('\n')[0]
-                self.logger.info(f"LaTeX available: {version_info}")
+                self.logger.info(f"Tectonic available: {version_info}")
                 return True, version_info
             else:
-                return False, "pdflatex command failed"
+                return False, "tectonic command failed"
                 
         except subprocess.TimeoutExpired:
-            return False, "pdflatex command timed out"
+            return False, "tectonic command timed out"
         except FileNotFoundError:
-            return False, "pdflatex not found - LaTeX not installed"
+            return False, "tectonic not found - Tectonic LaTeX engine not installed"
         except Exception as e:
-            return False, f"Error checking LaTeX: {str(e)}"
+            return False, f"Error checking Tectonic: {str(e)}"
     
     def cleanup_temp_files(self, max_age_hours: int = 24) -> int:
         """

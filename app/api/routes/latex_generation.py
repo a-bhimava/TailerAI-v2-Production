@@ -126,11 +126,9 @@ def _convert_request_to_content_dict(request: GenerateResumeRequest) -> Dict[str
     # Convert work experiences with achievements
     for work_exp in request.work_experiences:
         exp_dict = work_exp.dict()
-        # Format as expected by LaTeX service
-        content['work_experiences'].append({
-            'experience': exp_dict,
-            'achievements': [{'achievement_text': text} for text in work_exp.achievements]
-        })
+        # Format as expected by LaTeX service - merge experience data with achievements directly
+        exp_dict['achievements'] = work_exp.achievements  # Keep as strings, not objects
+        content['work_experiences'].append(exp_dict)
     
     return content
 

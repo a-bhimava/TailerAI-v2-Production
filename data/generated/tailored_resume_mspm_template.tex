@@ -1,0 +1,97 @@
+% Ultra-compact, high-density resume with section lines, following mspm_template.tex exactly
+\documentclass[10pt,letterpaper]{article}
+\usepackage[left=0.5in, right=0.5in, top=0.5in, bottom=0.3in]{geometry}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tikz}
+
+% Remove page numbers
+\pagestyle{empty}
+
+% Section formatting (tighter)
+\titleformat{\section}{\bfseries\uppercase}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{0.5ex}{0.2ex}
+
+% Custom entry command
+\newcommand{\resumeEntry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}Xr@{}}
+    \textbf{#1} #2 & #3 \\
+    \textit{#4} & \\
+  \end{tabularx}
+}
+
+% Bullet formatting (flush left)
+\setlist[itemize]{left=0em, itemsep=0.1em, topsep=0.1em, parsep=0em, partopsep=0em}
+
+% Reduce line spacing globally
+\linespread{0.97}
+\setlength{\parskip}{0em}
+
+% Horizontal rule command (force paragraph break)
+\newcommand{\sectionline}{\par\vspace{-0.5em}\noindent\rule{\textwidth}{0.6pt}\vspace{0.3em}\par}
+
+\begin{document}
+
+% Header
+\begin{center}
+  {\LARGE \textbf{PRODUCT MANAGER - EDTECH SPECIALIST}}\\
+  555.123.4567 $|$ pm.candidate@email.com $|$ linkedin.com/in/pm-candidate $|$ San Francisco, CA
+\end{center}
+\vspace{0.5em}
+
+% Education
+\section*{EDUCATION}
+% No line above EDUCATION
+
+% Stanford
+\noindent\textbf{STANFORD UNIVERSITY} \hfill Stanford, CA\\
+\textit{Bachelor of Science in Computer Science -- GPA: 3.7/4.0} \hfill 06/20
+\begin{itemize}
+  \item Magna Cum Laude. Relevant Coursework: Human-Computer Interaction, Data Structures, Database Systems, Software Engineering.
+\end{itemize}
+
+% Work Experience
+\section*{WORK EXPERIENCE}
+\sectionline
+
+% TECHVISION INC
+\noindent\textbf{TECHVISION INC (Leading EdTech Platform)} \hfill San Francisco, CA\\
+\textit{Senior Product Manager} \hfill 07/23 -- Present
+\begin{itemize}
+  \item Product Leadership: Led cross-functional team to launch new assessment module, resulting in 40\% increase in student engagement and 25\% improvement in learning outcomes across K-12 platform serving 500K+ students.
+  \item Process Optimization: Implemented agile development methodology across product team, reducing feature delivery time by 30\% and improving code quality metrics by 50\% through systematic workflow improvements.
+  \item User Research \& Strategy: Conducted comprehensive user research and usability testing with 500+ teachers, identifying key pain points that informed product roadmap priorities and enhanced user experience design.
+  \item Cross-functional Collaboration: Collaborated with engineering and design teams to redesign core user interface, improving user satisfaction scores by 35\% and reducing support tickets by 20\%.
+\end{itemize}
+
+% INNOVATELABS
+\noindent\textbf{INNOVATELABS (B2B SaaS Analytics Platform)} \hfill Palo Alto, CA\\
+\textit{Product Manager} \hfill 07/21 -- 07/23
+\begin{itemize}
+  \item Revenue Growth: Developed and launched analytics dashboard feature used by 80\% of customers, generating \$2M additional ARR through improved data visualization and customer insights platform.
+  \item Data-Driven Optimization: Led A/B testing program for key product features, improving conversion rates by 25\% through systematic experimentation and statistical analysis of user behavior patterns.
+\end{itemize}
+Technical Experience: Product Management, User Research, Data Analysis, SQL, Python; Tools: Jira, Confluence, Figma, Analytics platforms
+
+% Project Experience
+\section*{PROJECT EXPERIENCE}
+\sectionline
+
+\begin{itemize}
+  \item Learning Analytics Platform -- Developed comprehensive analytics platform for K-12 educational insights as Product Lead. Improved student outcome tracking by 60\% and reduced teacher workload by 30\%. Adopted by 500+ schools with 6-person development team using Python, SQL, React, and data visualization tools.
+  \item EdTech Assessment Module -- Led product strategy for cross-functional launch of new assessment capabilities. Collaborated with UX design and engineering teams to deliver user-centered solution resulting in 40\% engagement increase and 25\% learning outcome improvement.
+\end{itemize}
+
+% Additional Information
+\section*{ADDITIONAL INFORMATION}
+\sectionline
+
+\begin{itemize}
+  \item Core Skills: Product Management, User Experience Design, Cross-functional Collaboration, Agile Methodologies, Scrum, Requirements Gathering, EdTech, K-12 Education, SaaS platforms.
+  \item Technical Proficiencies: Advanced proficiency in data analysis, user research methodologies, A/B testing, SQL querying, and product analytics tools for data-driven decision making.
+\end{itemize}
+
+\end{document}
