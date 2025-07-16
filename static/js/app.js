@@ -494,18 +494,23 @@ async function generateResumeAPI(params) {
         const dataset = window.dataset.dataset;
         
         // Transform data to match LaTeX API format
-        const workExperiences = (dataset.work_experiences || []).map(exp => ({
-            experience_id: exp.id || '',
-            company_name: exp.company_name || '',
-            position_title: exp.position_title || '',
-            location: exp.location || null,
-            start_date: exp.start_date || null,
-            end_date: exp.end_date || null,
-            company_description: exp.company_description || null,
-            achievements: (exp.achievements || []).map(achievement => 
-                typeof achievement === 'string' ? achievement : achievement.achievement_text || achievement
-            )
-        }));
+        const workExperiences = (dataset.work_experiences || []).map(exp => {
+            // Filter achievements for this work experience
+            const expAchievements = (dataset.achievements || [])
+                .filter(achievement => achievement.work_experience_id === exp.id)
+                .map(achievement => achievement.achievement_text || achievement);
+            
+            return {
+                experience_id: exp.id || '',
+                company_name: exp.company_name || '',
+                position_title: exp.position_title || '',
+                location: exp.location || null,
+                start_date: exp.start_date || null,
+                end_date: exp.end_date || null,
+                company_description: exp.company_description || null,
+                achievements: expAchievements
+            };
+        });
         
         const education = (dataset.education || []).map(edu => ({
             institution_name: edu.institution_name || '',
@@ -546,6 +551,13 @@ async function generateResumeAPI(params) {
         
         console.log('LaTeX API Request Data:', requestData);
         console.log('Work Experiences:', workExperiences);
+        // Debug achievements specifically
+        workExperiences.forEach((exp, i) => {
+            console.log(`Work Experience ${i} (${exp.company_name}): ${exp.achievements.length} achievements`);
+            exp.achievements.forEach((ach, j) => {
+                console.log(`  Achievement ${j}: ${ach.substring(0, 50)}...`);
+            });
+        });
         console.log('Education:', education);
         console.log('Skills:', skills);
         console.log('Projects:', projects);
