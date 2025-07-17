@@ -327,18 +327,18 @@ class ResumePreviewManager {
             this.showProgress('Generating your optimized resume...');
             this.updateButtonStates();
 
-            // Prepare generation data
+            // Convert selected items to full content data
+            const fullContentData = await this.convertSelectedItemsToFullContent(this.selectedContent);
+
+            // Prepare generation data in the format expected by the backend
             const generationData = {
-                selected_content: this.selectedContent,
-                job_analysis: this.jobAnalysis,
-                settings: this.generationSettings,
-                user_preferences: {
-                    template: this.generationSettings.template,
-                    font_size: this.generationSettings.fontSize,
-                    margins: this.generationSettings.margins,
-                    color_scheme: this.generationSettings.colorScheme,
-                    section_order: this.generationSettings.sectionOrder
-                }
+                work_experiences: fullContentData.work_experiences || [],
+                education: fullContentData.education || [],
+                skills: fullContentData.skills || [],
+                projects: fullContentData.projects || [],
+                certifications: fullContentData.certifications || [],
+                additional_sections: fullContentData.additional_sections || {},
+                filename_prefix: "resume"
             };
 
             const response = await window.api.generateResume(generationData);

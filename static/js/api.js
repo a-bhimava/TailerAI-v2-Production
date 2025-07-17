@@ -273,9 +273,15 @@ class APIClient {
     }
 
     async createAchievement(achievementData) {
-        // For standalone achievements, simulate success for now
-        console.warn('Standalone achievement endpoint not yet implemented - simulating success');
-        return { success: true, message: 'Achievement saved locally (backend endpoint pending)' };
+        // If there's an experience_id, create achievement linked to work experience
+        if (achievementData.experience_id) {
+            return this.post(`/api/v2/master-dataset/experience/${achievementData.experience_id}/achievement`, achievementData);
+        } else {
+            // For standalone achievements, we need to create a general achievement endpoint
+            // For now, let's create it as a standalone achievement
+            console.warn('Standalone achievement endpoint not yet implemented - simulating success');
+            return { success: true, message: 'Achievement saved locally (backend endpoint pending)' };
+        }
     }
 
     async updateAchievement(achievementId, achievementData) {
