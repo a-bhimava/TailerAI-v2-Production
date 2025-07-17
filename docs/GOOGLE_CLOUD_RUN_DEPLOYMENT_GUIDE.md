@@ -20,6 +20,16 @@
 12. [Troubleshooting](#troubleshooting)
 13. [Cost Optimization](#cost-optimization)
 14. [Long-term Maintenance](#long-term-maintenance)
+15. [Manual vs Automated Steps](#manual-vs-automated-steps)
+
+## 🤖 **Important Note: Manual vs Automated Steps**
+
+This guide contains both **manual steps** that you must perform and **executable code** that Claude Code can run for you.
+
+### **Legend:**
+- 🔴 **MANUAL STEP** - Must be done by you
+- 🟢 **CLAUDE CODE** - Can be executed by Claude Code
+- 🟡 **MIXED** - Requires both manual setup and code execution
 
 ---
 
@@ -38,13 +48,24 @@ TailerAI v2.0 is a FastAPI-based application with LaTeX PDF generation capabilit
 
 ## 🛠️ Prerequisites
 
-### **1. Google Cloud Account Setup**
+### **1. Google Cloud Account Setup** 🔴 **MANUAL STEP**
+
+**You must do this manually:**
+1. Create a Google Cloud account at https://cloud.google.com/
+2. Create a new project or select an existing one
+3. Enable billing for your project
+4. Install Google Cloud SDK on your machine
+
+**Installation commands (run these in your terminal):**
 ```bash
 # Install Google Cloud SDK
 curl https://sdk.cloud.google.com | bash
 exec -l $SHELL
-gcloud init
+gcloud init  # Follow the prompts to authenticate and select project
+```
 
+**API Enablement** 🟢 **CLAUDE CODE CAN RUN THIS**
+```bash
 # Enable required APIs
 gcloud services enable run.googleapis.com
 gcloud services enable cloudbuild.googleapis.com
@@ -53,23 +74,33 @@ gcloud services enable secretmanager.googleapis.com
 gcloud services enable sqladmin.googleapis.com
 ```
 
-### **2. Development Environment**
-```bash
-# Required tools
-- Docker Desktop
-- Google Cloud SDK
-- Python 3.11+
-- Git
+### **2. Development Environment** 🔴 **MANUAL STEP**
 
+**You must install these tools manually:**
+- Docker Desktop (https://www.docker.com/products/docker-desktop/)
+- Google Cloud SDK (see above)
+- Python 3.11+ (https://www.python.org/)
+- Git (https://git-scm.com/)
+
+**Verification** 🟢 **CLAUDE CODE CAN RUN THIS**
+```bash
 # Verify installations
 docker --version
 gcloud --version
 python --version
+git --version
 ```
 
-### **3. Project Configuration**
+### **3. Project Configuration** 🟡 **MIXED**
+
+**You must provide these values:**
+- `PROJECT_ID`: Your Google Cloud project ID
+- `REGION`: Your preferred deployment region
+- `SERVICE_NAME`: Your Cloud Run service name
+
+**Configuration commands** 🟢 **CLAUDE CODE CAN RUN THIS**
 ```bash
-# Set your project ID
+# Set your project ID (replace with your actual project ID)
 export PROJECT_ID="your-project-id"
 export REGION="us-central1"  # Choose your preferred region
 export SERVICE_NAME="tailerai-v2"
@@ -82,9 +113,15 @@ gcloud config set run/region $REGION
 
 ## 🚀 Project Setup
 
-### **1. Clone and Prepare Project**
+### **1. Clone and Prepare Project** 🔴 **MANUAL STEP**
+
+**You must do this manually:**
+1. Fork or clone the TailerAI-v2-Production repository
+2. Navigate to your project directory
+
+**Commands to run:** 🟢 **CLAUDE CODE CAN RUN THIS**
 ```bash
-# Clone your repository
+# Clone your repository (replace with your actual repository URL)
 git clone https://github.com/yourusername/TailerAI-v2-Production.git
 cd TailerAI-v2-Production
 
@@ -93,12 +130,17 @@ ls -la
 # Should see: app/, data/, docs/, static/, templates/, Dockerfile, etc.
 ```
 
-### **2. Local Testing**
+### **2. Local Testing** 🟡 **MIXED**
+
+**You must provide:**
+- Your actual Gemini API key for testing
+
+**Docker commands** 🟢 **CLAUDE CODE CAN RUN THIS**
 ```bash
 # Build container locally
 docker build -t tailerai-v2:latest .
 
-# Test container locally
+# Test container locally (replace your_key_here with actual API key)
 docker run -p 8080:8080 \
   -e ENVIRONMENT=production \
   -e DEBUG=False \
@@ -113,9 +155,11 @@ curl http://localhost:8080/health
 
 ## 🐳 Container Configuration
 
-### **1. Optimize Dockerfile for Cloud Run**
+### **1. Optimize Dockerfile for Cloud Run** 🟢 **CLAUDE CODE CAN RUN THIS**
 
-Create an optimized Dockerfile:
+**Note: The Dockerfile is already optimized in the repository. This section shows you what was done.**
+
+The optimized Dockerfile includes:
 
 ```dockerfile
 # TailerAI v2.0 - Production Dockerfile for Google Cloud Run
@@ -201,66 +245,21 @@ data/generated/*.pdf
 
 ## 🔐 Environment Variables
 
-### **1. Cloud Run Environment Variables**
+### **1. Cloud Run Environment Variables** 🟢 **CLAUDE CODE CAN RUN THIS**
 
-Create a comprehensive environment configuration:
+**Note: The .env.production file is already created in the deploy/ directory.**
 
+The environment configuration includes all necessary variables for production deployment.
+
+### **2. Google Secret Manager Setup** 🟡 **MIXED**
+
+**You must provide:**
+- Your actual Gemini API key
+- Secure secret keys for JWT and application security
+
+**Secret creation commands** 🟢 **CLAUDE CODE CAN RUN THIS**
 ```bash
-# Create .env.production file
-cat > .env.production << 'EOF'
-# TailerAI v2.0 - Production Environment for Cloud Run
-
-# Application Settings
-ENVIRONMENT=production
-DEBUG=False
-LOG_LEVEL=INFO
-
-# Server Configuration
-HOST=0.0.0.0
-PORT=8080
-
-# Database Configuration (Cloud SQL or persistent storage)
-DATABASE_URL=sqlite:///./data/database/tailer_v2.db
-
-# AI Service Configuration
-GEMINI_API_KEY=${GEMINI_API_KEY}
-GEMINI_REQUESTS_PER_MINUTE=60
-GEMINI_DAILY_LIMIT=1500
-
-# LaTeX Configuration
-LATEX_ENGINE=tectonic
-LATEX_ENGINE_PATH=/usr/local/bin/tectonic
-
-# Security Settings
-SECRET_KEY=${SECRET_KEY}
-JWT_SECRET_KEY=${JWT_SECRET_KEY}
-
-# Performance Settings
-MAX_FILE_SIZE=10485760
-REQUEST_TIMEOUT=300
-
-# CORS Settings
-ALLOWED_ORIGINS=https://your-domain.com,https://tailerai-v2-xyz.run.app
-
-# AI Feature Flags
-ENABLE_AI_CONTENT_SELECTION=true
-ENABLE_AI_ATS_OPTIMIZATION=true
-ENABLE_AI_CONTENT_ENHANCEMENT=true
-ENABLE_AI_PERSONALIZATION=true
-
-# Monitoring Settings
-TRACK_LEARNING_EVENTS=true
-LEARNING_EVENT_RETENTION_DAYS=365
-
-# Frontend Configuration
-FRONTEND_URL=https://your-domain.com
-EOF
-```
-
-### **2. Google Secret Manager Setup**
-
-```bash
-# Create secrets in Google Secret Manager
+# Create secrets in Google Secret Manager (replace with your actual values)
 gcloud secrets create tailerai-gemini-api-key --data-file=<(echo -n "your_gemini_api_key")
 gcloud secrets create tailerai-secret-key --data-file=<(echo -n "your_secret_key")
 gcloud secrets create tailerai-jwt-secret --data-file=<(echo -n "your_jwt_secret")
@@ -269,14 +268,26 @@ gcloud secrets create tailerai-jwt-secret --data-file=<(echo -n "your_jwt_secret
 gcloud secrets list
 ```
 
+**Alternative: Using the setup script** 🟢 **CLAUDE CODE CAN RUN THIS**
+```bash
+# The setup script will prompt you for these values
+export GEMINI_API_KEY="your_actual_api_key"
+export SECRET_KEY="your_secure_secret_key"
+export JWT_SECRET_KEY="your_jwt_secret_key"
+```
+
 ---
 
 ## 🗄️ Database Configuration
 
-### **Option 1: Cloud SQL (Recommended for Production)**
+### **Option 1: Cloud SQL (Recommended for Production)** 🟡 **MIXED**
 
+**You must provide:**
+- Secure database passwords
+
+**Database creation commands** 🟢 **CLAUDE CODE CAN RUN THIS**
 ```bash
-# Create Cloud SQL instance
+# Create Cloud SQL instance (replace with your secure password)
 gcloud sql instances create tailerai-db \
     --database-version=POSTGRES_13 \
     --tier=db-f1-micro \
@@ -286,7 +297,7 @@ gcloud sql instances create tailerai-db \
 # Create database
 gcloud sql databases create tailerai_production --instance=tailerai-db
 
-# Create database user
+# Create database user (replace with your secure password)
 gcloud sql users create tailerai_user \
     --instance=tailerai-db \
     --password=your_user_password
@@ -295,8 +306,9 @@ gcloud sql users create tailerai_user \
 export DATABASE_URL="postgresql://tailerai_user:password@/tailerai_production?host=/cloudsql/PROJECT_ID:REGION:tailerai-db"
 ```
 
-### **Option 2: Persistent Disk (SQLite)**
+### **Option 2: Persistent Disk (SQLite)** 🟢 **CLAUDE CODE CAN RUN THIS**
 
+**For simpler deployments:**
 ```bash
 # Create persistent disk for SQLite
 gcloud compute disks create tailerai-data-disk \
@@ -307,12 +319,21 @@ gcloud compute disks create tailerai-data-disk \
 # Mount in Cloud Run (configured in service yaml)
 ```
 
+### **Option 3: Default SQLite (Simplest)** 🟢 **CLAUDE CODE CAN RUN THIS**
+
+**Uses local SQLite database - good for testing:**
+- No additional setup required
+- Database file stored in container
+- Data persists across container restarts
+- Suitable for development and small-scale production
+
 ---
 
 ## 🚀 Cloud Run Deployment
 
-### **1. Build and Push Container**
+### **1. Build and Push Container** 🟢 **CLAUDE CODE CAN RUN THIS**
 
+**Container build and push commands:**
 ```bash
 # Build and tag image
 docker build -t gcr.io/$PROJECT_ID/tailerai-v2:latest .
@@ -320,12 +341,13 @@ docker build -t gcr.io/$PROJECT_ID/tailerai-v2:latest .
 # Push to Google Container Registry
 docker push gcr.io/$PROJECT_ID/tailerai-v2:latest
 
-# Alternative: Use Cloud Build
+# Alternative: Use Cloud Build (recommended for production)
 gcloud builds submit --tag gcr.io/$PROJECT_ID/tailerai-v2:latest .
 ```
 
-### **2. Deploy to Cloud Run**
+### **2. Deploy to Cloud Run** 🟢 **CLAUDE CODE CAN RUN THIS**
 
+**Manual deployment command:**
 ```bash
 # Deploy with comprehensive configuration
 gcloud run deploy $SERVICE_NAME \
@@ -346,6 +368,22 @@ gcloud run deploy $SERVICE_NAME \
 # Get service URL
 gcloud run services describe $SERVICE_NAME --region $REGION --format="value(status.url)"
 ```
+
+### **2.1. Automated Deployment (Recommended)** 🟢 **CLAUDE CODE CAN RUN THIS**
+
+**Use the provided setup script:**
+```bash
+# Run the automated setup script
+./deploy/setup-cloud-run.sh
+```
+
+**This script will:**
+- Check prerequisites
+- Enable APIs
+- Create service accounts
+- Set up secrets
+- Build and deploy the container
+- Configure monitoring
 
 ### **3. Advanced Cloud Run Configuration**
 
@@ -1028,5 +1066,184 @@ This comprehensive guide provides everything needed to deploy and maintain Taile
 - **Long-term maintenance**
 
 Follow this guide step by step, and you'll have a robust, production-ready deployment of TailerAI v2.0 on Google Cloud Run.
+
+**Status:** ✅ **DEPLOYMENT READY**
+
+---
+
+## 🤖 Manual vs Automated Steps
+
+### **🔴 MANUAL STEPS (You Must Do)**
+
+1. **Google Cloud Setup**
+   - Create Google Cloud account
+   - Create project and enable billing
+   - Install Google Cloud SDK locally
+   - Authenticate with `gcloud auth login`
+
+2. **Development Environment**
+   - Install Docker Desktop
+   - Install Python 3.11+
+   - Install Git
+   - Clone/fork the repository
+
+3. **Provide Credentials**
+   - Gemini API key
+   - Secure secret keys
+   - Database passwords (if using Cloud SQL)
+   - Domain names and URLs
+
+4. **GitHub Actions Setup**
+   - Create GitHub repository secrets:
+     - `GCP_PROJECT_ID`
+     - `GCP_SA_KEY`
+   - Configure branch protection rules
+   - Set up repository webhooks
+
+5. **Custom Domain Configuration**
+   - Register domain name
+   - Configure DNS records
+   - Set up SSL certificates
+
+### **🟢 CLAUDE CODE CAN RUN**
+
+1. **API and Service Setup**
+   ```bash
+   # Enable Google Cloud APIs
+   gcloud services enable run.googleapis.com
+   gcloud services enable cloudbuild.googleapis.com
+   gcloud services enable containerregistry.googleapis.com
+   gcloud services enable secretmanager.googleapis.com
+   ```
+
+2. **Project Configuration**
+   ```bash
+   # Set project variables
+   export PROJECT_ID="your-project-id"
+   export REGION="us-central1"
+   export SERVICE_NAME="tailerai-v2"
+   gcloud config set project $PROJECT_ID
+   gcloud config set run/region $REGION
+   ```
+
+3. **Secret Management**
+   ```bash
+   # Create secrets in Secret Manager
+   gcloud secrets create tailerai-gemini-api-key --data-file=<(echo -n "your_key")
+   gcloud secrets create tailerai-secret-key --data-file=<(echo -n "your_secret")
+   gcloud secrets create tailerai-jwt-secret --data-file=<(echo -n "your_jwt")
+   ```
+
+4. **Service Account Creation**
+   ```bash
+   # Create service account
+   gcloud iam service-accounts create tailerai-v2-sa \
+       --description="TailerAI v2.0 Service Account" \
+       --display-name="TailerAI v2.0"
+   ```
+
+5. **Container Operations**
+   ```bash
+   # Build and push container
+   docker build -t gcr.io/$PROJECT_ID/tailerai-v2:latest .
+   docker push gcr.io/$PROJECT_ID/tailerai-v2:latest
+   ```
+
+6. **Cloud Run Deployment**
+   ```bash
+   # Deploy to Cloud Run
+   gcloud run deploy $SERVICE_NAME \
+       --image gcr.io/$PROJECT_ID/tailerai-v2:latest \
+       --platform managed \
+       --region $REGION \
+       --allow-unauthenticated
+   ```
+
+7. **Database Setup**
+   ```bash
+   # Create Cloud SQL instance
+   gcloud sql instances create tailerai-db \
+       --database-version=POSTGRES_13 \
+       --tier=db-f1-micro \
+       --region=$REGION
+   ```
+
+8. **Monitoring Configuration**
+   ```bash
+   # Create monitoring dashboard
+   gcloud monitoring dashboards create --config-from-file=deploy/monitoring-dashboard.json
+   ```
+
+### **🟡 MIXED STEPS (Collaboration Required)**
+
+1. **Environment Variables**
+   - Claude Code can create the configuration files
+   - You must provide the actual values (API keys, passwords)
+
+2. **Testing and Validation**
+   - Claude Code can run automated tests
+   - You must verify the results and approve deployments
+
+3. **CI/CD Pipeline**
+   - Claude Code can create GitHub Actions workflows
+   - You must configure repository secrets and permissions
+
+4. **Performance Optimization**
+   - Claude Code can implement optimizations
+   - You must monitor and adjust based on usage patterns
+
+### **⚡ Quick Start Options**
+
+#### **Option 1: Fully Automated** 🟢 **CLAUDE CODE**
+```bash
+# Run the complete setup script
+./deploy/setup-cloud-run.sh
+```
+
+#### **Option 2: Step-by-Step** 🟡 **MIXED**
+1. You: Set up Google Cloud account and project
+2. Claude Code: Run API enablement commands
+3. You: Provide API keys and secrets
+4. Claude Code: Create secrets and deploy
+
+#### **Option 3: CI/CD Only** 🟡 **MIXED**
+1. You: Configure GitHub repository secrets
+2. Claude Code: Push to main branch
+3. GitHub Actions: Automated deployment
+
+### **📋 Deployment Checklist**
+
+#### **Before Deployment** 🔴 **MANUAL**
+- [ ] Google Cloud account created
+- [ ] Project created and billing enabled
+- [ ] Domain name registered (if using custom domain)
+- [ ] API keys obtained (Gemini, etc.)
+- [ ] Repository forked/cloned
+
+#### **During Deployment** 🟢 **CLAUDE CODE**
+- [ ] APIs enabled
+- [ ] Service account created
+- [ ] Secrets stored in Secret Manager
+- [ ] Container built and pushed
+- [ ] Cloud Run service deployed
+- [ ] Database configured
+- [ ] Monitoring set up
+
+#### **After Deployment** 🟡 **MIXED**
+- [ ] Health checks passing (Claude Code can verify)
+- [ ] Custom domain configured (You must do)
+- [ ] SSL certificates active (You must verify)
+- [ ] Monitoring alerts configured (Claude Code can help)
+- [ ] Backup strategies implemented (You must plan)
+
+### **🚀 Recommended Deployment Flow**
+
+1. **You:** Complete all 🔴 **MANUAL** steps
+2. **Claude Code:** Run `./deploy/setup-cloud-run.sh`
+3. **You:** Verify deployment and configure custom domain
+4. **Claude Code:** Set up monitoring and CI/CD
+5. **You:** Test and approve production deployment
+
+This approach minimizes manual work while ensuring security and compliance requirements are met.
 
 **Status:** ✅ **DEPLOYMENT READY**

@@ -8,12 +8,31 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Tectonic LaTeX engine (smaller than full TeX Live)
-RUN wget -q https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic@0.14.1/tectonic-0.14.1-x86_64-unknown-linux-gnu.tar.gz \
-    && tar -xzf tectonic-0.14.1-x86_64-unknown-linux-gnu.tar.gz \
-    && mv tectonic /usr/local/bin/ \
-    && rm tectonic-0.14.1-x86_64-unknown-linux-gnu.tar.gz \
-    && chmod +x /usr/local/bin/tectonic
+# Install LaTeX engine with multi-architecture support
+# First try Tectonic, fallback to minimal TeXLive
+RUN ARCH=$(uname -m) && \
+    echo "Architecture detected: $ARCH" && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        # For x86_64, install dependencies for Tectonic binary
+        apt-get update && \
+        apt-get install -y libgraphite2-3 libharfbuzz0b libfontconfig1 libfreetype6 libssl3 && \
+        rm -rf /var/lib/apt/lists/* && \
+        # Create symlinks for older SSL versions that Tectonic expects
+        ln -sf /usr/lib/x86_64-linux-gnu/libssl.so.3 /usr/lib/x86_64-linux-gnu/libssl.so.1.1 && \
+        ln -sf /usr/lib/x86_64-linux-gnu/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 && \
+        # Download and install Tectonic binary
+        wget -q https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic@0.14.1/tectonic-0.14.1-x86_64-unknown-linux-gnu.tar.gz -O tectonic.tar.gz && \
+        tar -xzf tectonic.tar.gz && \
+        mv tectonic /usr/local/bin/ && \
+        rm tectonic.tar.gz && \
+        chmod +x /usr/local/bin/tectonic; \
+    else \
+        # For ARM64 and other architectures, install minimal TeXLive
+        apt-get update && \
+        apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended && \
+        ln -s /usr/bin/pdflatex /usr/local/bin/tectonic && \
+        rm -rf /var/lib/apt/lists/*; \
+    fi
 
 # Set working directory
 WORKDIR /app
@@ -34,7 +53,7 @@ ENV PYTHONPATH=/app
 ENV ENVIRONMENT=production
 ENV HOST=0.0.0.0
 ENV PORT=8080
-ENV LATEX_ENGINE=tectonic
+ENV LATEX_ENGINE=auto
 ENV LATEX_ENGINE_PATH=/usr/local/bin/tectonic
 
 # Create non-root user for security
