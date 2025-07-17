@@ -54,6 +54,13 @@ class LaTeXGenerationService:
         # Remove control characters that cause LaTeX compilation errors
         cleaned_text = re.sub(r'[\x00-\x1f]', '', text)
         
+        # Handle newlines properly - replace with spaces for single-line output
+        # This prevents LaTeX formatting issues in bullet points
+        cleaned_text = re.sub(r'\s*\n\s*', ' ', cleaned_text)
+        
+        # Remove extra whitespace
+        cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()
+        
         # Normalize Unicode text
         import unicodedata
         normalized_text = unicodedata.normalize('NFKD', cleaned_text)
@@ -344,9 +351,17 @@ class LaTeXGenerationService:
             work_experience_content = ""
             if selected_content.get('work_experiences'):
                 for exp_data in selected_content['work_experiences']:
-                    # The experience data is directly in exp_data, not nested under 'experience'
-                    achievements = exp_data.get('achievements', [])
-                    work_experience_content += self._format_work_experience_entry(exp_data, achievements)
+                    # Handle both formats: direct experience data and nested format
+                    if 'experience' in exp_data:
+                        # Nested format from content selection service (optimized endpoint)
+                        experience = exp_data['experience']
+                        achievements = exp_data.get('achievements', [])
+                    else:
+                        # Direct format from generate endpoint
+                        experience = exp_data
+                        achievements = exp_data.get('achievements', [])
+                    
+                    work_experience_content += self._format_work_experience_entry(experience, achievements)
             
             # Add fallback if no work experience content
             if not work_experience_content.strip():
