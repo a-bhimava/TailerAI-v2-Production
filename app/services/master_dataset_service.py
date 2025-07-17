@@ -434,8 +434,34 @@ class MasterDatasetService:
                 session.commit()
                 session.refresh(achievement)
                 
+                # Extract data while session is still active to avoid detached instance errors
+                achievement_data_copy = {
+                    'id': achievement.id,
+                    'achievement_text': achievement.achievement_text,
+                    'achievement_category': achievement.achievement_category,
+                    'impact_level': achievement.impact_level,
+                    'business_function': achievement.business_function,
+                    'keywords': achievement.keywords,
+                    'skills_demonstrated': achievement.skills_demonstrated,
+                    'quantified_metrics': achievement.quantified_metrics,
+                    'ats_keywords': achievement.ats_keywords,
+                    'time_period': achievement.time_period,
+                    'context_tags': achievement.context_tags,
+                    'selection_count': achievement.selection_count,
+                    'success_correlation': achievement.success_correlation,
+                    'experience_id': achievement.experience_id,
+                    'profile_id': achievement.profile_id
+                }
+                
                 self.logger.info(f"Added achievement for user_id: {user_id}, experience_id: {experience_id}")
-                return achievement
+                
+                # Create a mock object with the data to return
+                class AchievementData:
+                    def __init__(self, data):
+                        for key, value in data.items():
+                            setattr(self, key, value)
+                
+                return AchievementData(achievement_data_copy)
                 
         except SQLAlchemyError as e:
             self.logger.error(f"Database error adding achievement: {str(e)}")
