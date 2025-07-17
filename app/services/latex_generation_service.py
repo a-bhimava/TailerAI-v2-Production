@@ -65,24 +65,29 @@ class LaTeXGenerationService:
         import unicodedata
         normalized_text = unicodedata.normalize('NFKD', cleaned_text)
         
-        # LaTeX special characters that need escaping
-        latex_special_chars = {
-            '&': r'\&',
-            '%': r'\%',
-            '$': r'\$',
-            '#': r'\#',
-            '^': r'\^{}',
-            '_': r'\_',
-            '{': r'\{',
-            '}': r'\}',
-            '~': r'\textasciitilde{}',
-            '\\': r'\textbackslash{}',
-        }
+        # LaTeX special characters that need escaping (order matters!)
+        latex_special_chars = [
+            ('\\', r'\textbackslash{}'),  # Must be first to avoid double escaping
+            ('&', r'\&'),
+            ('%', r'\%'),
+            ('$', r'\$'),
+            ('#', r'\#'),
+            ('^', r'\^{}'),
+            ('_', r'\_'),
+            ('{', r'\{'),
+            ('}', r'\}'),
+            ('~', r'\textasciitilde{}'),
+            ('|', r'\textbar{}'),  # Add pipe character escaping
+        ]
         
-        # Replace each special character
+        # Replace each special character in order
         escaped_text = normalized_text
-        for char, replacement in latex_special_chars.items():
+        for char, replacement in latex_special_chars:
             escaped_text = escaped_text.replace(char, replacement)
+        
+        # Additional safety: remove any remaining problematic characters
+        # Remove any character that might cause math mode issues
+        escaped_text = re.sub(r'[^\w\s\.\,\:\;\!\?\-\(\)\[\]\/\\\&\%\$\#\^\_\{\}\~\|]', '', escaped_text)
         
         return escaped_text
     
