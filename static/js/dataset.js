@@ -1993,7 +1993,7 @@ async function handleAchievementSubmit(event) {
         data.achievement_text = formData.get('achievement_text');
         
         // Set sensible defaults for the simplified form
-        data.achievement_category = 'general';
+        data.achievement_category = 'operational';
         data.impact_level = 5;
         data.business_function = 'general';
         data.keywords = [];
