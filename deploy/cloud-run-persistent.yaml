@@ -1,0 +1,161 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: tailerai-v2
+  namespace: 'tailer-466216'
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # Cloud SQL connection
+        run.googleapis.com/cloudsql-instances: 'tailer-466216:us-central1:tailerai-db'
+        
+        # Execution environment
+        run.googleapis.com/execution-environment: gen2
+        
+        # Auto-scaling configuration
+        autoscaling.knative.dev/maxScale: '10'
+        autoscaling.knative.dev/minScale: '0'
+        autoscaling.knative.dev/target: '70'
+        
+        # Performance settings
+        run.googleapis.com/memory: 2Gi
+        run.googleapis.com/cpu: '2'
+        run.googleapis.com/timeout: '300s'
+        run.googleapis.com/startup-cpu-boost: 'true'
+        
+    spec:
+      containerConcurrency: 100
+      timeoutSeconds: 300
+      containers:
+      - image: gcr.io/tailer-466216/tailerai-v2:latest
+        name: tailerai-v2
+        ports:
+        - name: http1
+          containerPort: 8080
+        
+        # Environment variables
+        env:
+        - name: ENVIRONMENT
+          value: production
+        - name: DEBUG
+          value: 'False'
+        - name: HOST
+          value: '0.0.0.0'
+        - name: LOG_LEVEL
+          value: 'INFO'
+        - name: LATEX_ENGINE
+          value: pdflatex
+        - name: LATEX_ENGINE_PATH
+          value: /usr/bin/pdflatex
+        
+        # Database configuration
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-database-url
+        - name: CLOUD_SQL_INSTANCE
+          value: 'tailer-466216:us-central1:tailerai-db'
+        - name: DB_POOL_SIZE
+          value: '20'
+        - name: DB_MAX_OVERFLOW
+          value: '30'
+        - name: DB_POOL_RECYCLE
+          value: '3600'
+        - name: DB_POOL_TIMEOUT
+          value: '30'
+        - name: DB_POOL_PRE_PING
+          value: 'true'
+        
+        # Performance settings
+        - name: MAX_FILE_SIZE
+          value: '10485760'  # 10MB
+        - name: REQUEST_TIMEOUT
+          value: '300'
+        
+        # AI service configuration
+        - name: ENABLE_AI_CONTENT_SELECTION
+          value: 'true'
+        - name: ENABLE_AI_ATS_OPTIMIZATION
+          value: 'true'
+        - name: ENABLE_AI_CONTENT_ENHANCEMENT
+          value: 'true'
+        - name: ENABLE_AI_PERSONALIZATION
+          value: 'true'
+        - name: GEMINI_REQUESTS_PER_MINUTE
+          value: '60'
+        - name: GEMINI_DAILY_LIMIT
+          value: '1500'
+        
+        # CORS configuration
+        - name: ALLOWED_ORIGINS
+          value: '["https://tailerai-v2-64408861474.us-central1.run.app"]'
+        
+        # Frontend configuration
+        - name: FRONTEND_URL
+          value: 'https://tailerai-v2-64408861474.us-central1.run.app'
+        
+        # Database password from Secret Manager
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-db-password
+        
+        # Secrets from Secret Manager
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-gemini-api-key
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-secret-key
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-jwt-secret
+        
+        # Resource limits
+        resources:
+          limits:
+            cpu: '2'
+            memory: 2Gi
+          requests:
+            cpu: '1'
+            memory: 1Gi
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        # Startup probe for longer initialization times (temporarily disabled)
+        # startupProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8080
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 10
+        #   timeoutSeconds: 10
+        #   failureThreshold: 30
+      
+      # Service account
+      serviceAccountName: 'tailerai-v2-sa@tailer-466216.iam.gserviceaccount.com'
+      
+  traffic:
+  - percent: 100
+    latestRevision: true

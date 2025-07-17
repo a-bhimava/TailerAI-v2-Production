@@ -39,9 +39,14 @@ class Settings(BaseSettings):
         default="sqlite:///./data/database/tailer_v2.db",
         env="DATABASE_URL"
     )
-    db_pool_size: int = Field(default=5, env="DB_POOL_SIZE")
-    db_max_overflow: int = Field(default=20, env="DB_MAX_OVERFLOW")
+    
+    # Cloud SQL specific settings
+    cloud_sql_instance: str = Field(default="", env="CLOUD_SQL_INSTANCE")
+    db_pool_size: int = Field(default=20, env="DB_POOL_SIZE")
+    db_max_overflow: int = Field(default=30, env="DB_MAX_OVERFLOW")
     db_pool_recycle: int = Field(default=3600, env="DB_POOL_RECYCLE")  # 1 hour
+    db_pool_timeout: int = Field(default=30, env="DB_POOL_TIMEOUT")
+    db_pool_pre_ping: bool = Field(default=True, env="DB_POOL_PRE_PING")
     
     # AI Service settings
     gemini_api_key: str = Field(default="", env="GEMINI_API_KEY")
