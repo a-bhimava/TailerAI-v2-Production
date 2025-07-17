@@ -496,10 +496,17 @@ class LaTeXGenerationService:
             with open(tex_file, 'w', encoding='utf-8') as f:
                 f.write(latex_content)
             
-            # Compile LaTeX to PDF using Tectonic
-            # Tectonic is a modern LaTeX engine that automatically handles packages
-            cmd = ['tectonic', f'{output_filename}.tex']
-            self.logger.info(f"========== LATEX COMPILATION WITH TECTONIC ==========")
+            # Compile LaTeX to PDF using configured LaTeX engine
+            latex_engine = settings.latex_engine_path or settings.latex_engine
+            
+            if settings.latex_engine == 'pdflatex':
+                # Use pdflatex with standard LaTeX compilation
+                cmd = [latex_engine, '-interaction=nonstopmode', f'{output_filename}.tex']
+            else:
+                # Use tectonic or other engines
+                cmd = [latex_engine, f'{output_filename}.tex']
+            
+            self.logger.info(f"========== LATEX COMPILATION WITH {settings.latex_engine.upper()} ==========")
             self.logger.info(f"Command: {' '.join(cmd)}")
             self.logger.info(f"Working directory: {work_dir}")
             self.logger.info(f"LaTeX file: {tex_file}")
@@ -630,30 +637,43 @@ class LaTeXGenerationService:
     
     async def validate_latex_installation(self) -> Tuple[bool, str]:
         """
-        Validate that Tectonic LaTeX engine is properly installed and available.
+        Validate that configured LaTeX engine is properly installed and available.
         Returns (is_available, version_info).
         """
+        latex_engine = settings.latex_engine_path or settings.latex_engine
+        engine_name = settings.latex_engine
+        
         try:
-            result = subprocess.run(
-                ['tectonic', '--version'],
-                capture_output=True,
-                text=True,
-                timeout=10
-            )
+            if engine_name == 'pdflatex':
+                # Check pdflatex version
+                result = subprocess.run(
+                    [latex_engine, '--version'],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+            else:
+                # Check tectonic or other engines
+                result = subprocess.run(
+                    [latex_engine, '--version'],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
             
             if result.returncode == 0:
                 version_info = result.stdout.split('\n')[0]
-                self.logger.info(f"Tectonic available: {version_info}")
+                self.logger.info(f"{engine_name} available: {version_info}")
                 return True, version_info
             else:
-                return False, "tectonic command failed"
+                return False, f"{engine_name} command failed"
                 
         except subprocess.TimeoutExpired:
-            return False, "tectonic command timed out"
+            return False, f"{engine_name} command timed out"
         except FileNotFoundError:
-            return False, "tectonic not found - Tectonic LaTeX engine not installed"
+            return False, f"{engine_name} not found - LaTeX engine not installed"
         except Exception as e:
-            return False, f"Error checking Tectonic: {str(e)}"
+            return False, f"Error checking {engine_name}: {str(e)}"
     
     def cleanup_temp_files(self, max_age_hours: int = 24) -> int:
         """

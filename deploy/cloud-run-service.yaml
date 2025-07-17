@@ -63,9 +63,9 @@ spec:
         - name: LOG_LEVEL
           value: 'INFO'
         - name: LATEX_ENGINE
-          value: tectonic
+          value: pdflatex
         - name: LATEX_ENGINE_PATH
-          value: /usr/local/bin/tectonic
+          value: /usr/bin/pdflatex
         
         # Database configuration
         - name: DATABASE_URL

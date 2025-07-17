@@ -91,8 +91,8 @@ class Settings(BaseSettings):
     auto_reanalyze_trigger_count: int = Field(default=3, env="AUTO_REANALYZE_TRIGGER_COUNT")
     
     # LaTeX settings
-    latex_engine: str = Field(default="tectonic", env="LATEX_ENGINE")
-    latex_engine_path: str = Field(default="tectonic", env="LATEX_ENGINE_PATH")
+    latex_engine: str = Field(default="pdflatex", env="LATEX_ENGINE")
+    latex_engine_path: str = Field(default="/usr/bin/pdflatex", env="LATEX_ENGINE_PATH")
     tex_live_path: str = Field(default="/usr/local/texlive", env="TEX_LIVE_PATH")
     
     # File storage settings
