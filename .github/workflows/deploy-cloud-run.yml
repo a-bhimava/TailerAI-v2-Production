@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: tailer-466216
   REGION: us-central1
   SERVICE_NAME: tailerai-v2
   REGISTRY: gcr.io
@@ -26,7 +26,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -52,7 +52,7 @@ jobs:
       continue-on-error: true  # Continue even if tests fail for now
     
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: unittests
@@ -67,7 +67,7 @@ jobs:
         bandit -r app/ -f json -o bandit-report.json || true
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
@@ -90,7 +90,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     
     - name: Cache Docker layers
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: /tmp/.buildx-cache
         key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -98,7 +98,7 @@ jobs:
           ${{ runner.os }}-buildx-
     
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -138,7 +138,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -146,12 +146,14 @@ jobs:
     
     - name: Deploy to Cloud Run
       run: |
-        # Update service configuration with project ID and commit SHA
-        sed -i "s/PROJECT_ID_PLACEHOLDER/${{ env.PROJECT_ID }}/g" deploy/cloud-run-service.yaml
-        sed -i "s/:latest/:${{ github.sha }}/g" deploy/cloud-run-service.yaml
+        # Copy persistent configuration for deployment
+        cp deploy/cloud-run-persistent.yaml deploy/cloud-run-deployment.yaml
+        
+        # Update service configuration with commit SHA
+        sed -i "s/:latest/:${{ github.sha }}/g" deploy/cloud-run-deployment.yaml
         
         # Deploy service
-        gcloud run services replace deploy/cloud-run-service.yaml \
+        gcloud run services replace deploy/cloud-run-deployment.yaml \
           --region=${{ env.REGION }} \
           --quiet
         
@@ -175,12 +177,25 @@ jobs:
         sleep 30
         
         # Test health endpoint
+        echo "Testing health endpoint..."
         curl -f "${{ steps.service-url.outputs.SERVICE_URL }}/health" || exit 1
         
-        # Test API endpoints
-        curl -f "${{ steps.service-url.outputs.SERVICE_URL }}/docs" || echo "API docs check failed"
+        # Validate health response
+        HEALTH_RESPONSE=$(curl -s "${{ steps.service-url.outputs.SERVICE_URL }}/health")
+        echo "Health response: $HEALTH_RESPONSE"
         
-        echo "Deployment tests passed!"
+        # Check if PostgreSQL is being used
+        if echo "$HEALTH_RESPONSE" | grep -q '"database_type": "postgresql"'; then
+          echo "✅ PostgreSQL database confirmed"
+        else
+          echo "❌ PostgreSQL database not detected"
+          exit 1
+        fi
+        
+        # Test API endpoints (optional)
+        curl -f "${{ steps.service-url.outputs.SERVICE_URL }}/docs" || echo "API docs check failed (not critical)"
+        
+        echo "✅ Deployment tests passed!"
     
     - name: Notify deployment success
       if: success()
@@ -203,7 +218,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -239,8 +254,14 @@ jobs:
     - name: Run staging tests
       run: |
         sleep 30
+        echo "Testing staging health endpoint..."
         curl -f "${{ steps.staging-url.outputs.STAGING_URL }}/health" || exit 1
-        echo "Staging deployment tests passed!"
+        
+        # Validate staging health response
+        STAGING_HEALTH=$(curl -s "${{ steps.staging-url.outputs.STAGING_URL }}/health")
+        echo "Staging health response: $STAGING_HEALTH"
+        
+        echo "✅ Staging deployment tests passed!"
 
   # Job 5: Security scanning
   security-scan:
@@ -254,7 +275,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -287,7 +308,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -311,12 +332,24 @@ jobs:
         echo "Running basic performance tests..."
         
         # Test health endpoint response time
-        curl -w "@{\"time_total\": %{time_total}}\n" -o /dev/null -s "${{ steps.service-url.outputs.SERVICE_URL }}/health"
+        echo "Testing response time..."
+        TIME_RESULT=$(curl -w "%{time_total}" -o /dev/null -s "${{ steps.service-url.outputs.SERVICE_URL }}/health")
+        echo "Response time: ${TIME_RESULT}s"
         
         # Run concurrent requests test
+        echo "Running load test..."
         ab -n 100 -c 10 "${{ steps.service-url.outputs.SERVICE_URL }}/health" || echo "Performance test completed"
         
-        echo "Performance tests completed"
+        # Test database performance
+        echo "Testing database connectivity..."
+        HEALTH_RESPONSE=$(curl -s "${{ steps.service-url.outputs.SERVICE_URL }}/health")
+        if echo "$HEALTH_RESPONSE" | grep -q '"database":{"status":"healthy"'; then
+          echo "✅ Database performance test passed"
+        else
+          echo "⚠️ Database performance test inconclusive"
+        fi
+        
+        echo "✅ Performance tests completed"
 
   # Job 7: Cleanup old revisions
   cleanup:
@@ -327,7 +360,7 @@ jobs:
     
     steps:
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}

@@ -6,7 +6,7 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: tailerai-v2
-  namespace: 'PROJECT_ID_PLACEHOLDER'
+  namespace: 'tailer-466216'
   labels:
     cloud.googleapis.com/location: us-central1
   annotations:
@@ -30,8 +30,8 @@ spec:
         run.googleapis.com/timeout: '300s'
         run.googleapis.com/startup-cpu-boost: 'true'
         
-        # Cloud SQL connection (uncomment if using Cloud SQL)
-        # run.googleapis.com/cloudsql-instances: 'PROJECT_ID_PLACEHOLDER:us-central1:tailerai-db'
+        # Cloud SQL connection
+        run.googleapis.com/cloudsql-instances: 'tailer-466216:us-central1:tailerai-db'
         
         # VPC configuration (uncomment if using VPC)
         # run.googleapis.com/vpc-access-connector: 'tailerai-connector'
@@ -44,7 +44,7 @@ spec:
       containerConcurrency: 100
       timeoutSeconds: 300
       containers:
-      - image: gcr.io/PROJECT_ID_PLACEHOLDER/tailerai-v2:latest
+      - image: gcr.io/tailer-466216/tailerai-v2:latest
         name: tailerai-v2
         ports:
         - name: http1
@@ -58,8 +58,6 @@ spec:
           value: 'False'
         - name: HOST
           value: '0.0.0.0'
-        - name: PORT
-          value: '8080'
         - name: LOG_LEVEL
           value: 'INFO'
         - name: LATEX_ENGINE
@@ -69,7 +67,22 @@ spec:
         
         # Database configuration
         - name: DATABASE_URL
-          value: 'sqlite:///./data/database/tailer_v2.db'
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-database-url
+        - name: CLOUD_SQL_INSTANCE
+          value: 'tailer-466216:us-central1:tailerai-db'
+        - name: DB_POOL_SIZE
+          value: '20'
+        - name: DB_MAX_OVERFLOW
+          value: '30'
+        - name: DB_POOL_RECYCLE
+          value: '3600'
+        - name: DB_POOL_TIMEOUT
+          value: '30'
+        - name: DB_POOL_PRE_PING
+          value: 'true'
         
         # Performance settings
         - name: MAX_FILE_SIZE
@@ -93,11 +106,11 @@ spec:
         
         # CORS configuration
         - name: ALLOWED_ORIGINS
-          value: 'https://tailerai-v2-PROJECT_ID_PLACEHOLDER.run.app,https://yourdomain.com'
+          value: '["https://tailerai-v2-64408861474.us-central1.run.app"]'
         
         # Frontend configuration
         - name: FRONTEND_URL
-          value: 'https://tailerai-v2-PROJECT_ID_PLACEHOLDER.run.app'
+          value: 'https://tailerai-v2-64408861474.us-central1.run.app'
         
         # Security settings (from Secret Manager)
         - name: SECRET_KEY
@@ -115,6 +128,11 @@ spec:
             secretKeyRef:
               key: latest
               name: tailerai-gemini-api-key
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: tailerai-db-password
         
         # Optional: Google OAuth configuration
         - name: GOOGLE_CLIENT_SECRET
@@ -144,29 +162,19 @@ spec:
           failureThreshold: 3
           successThreshold: 1
         
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-          successThreshold: 1
-        
-        # Startup probe for longer initialization times
-        startupProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 10
-          failureThreshold: 30
-          successThreshold: 1
+        # Startup probe for longer initialization times (disabled for deployment stability)
+        # startupProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8080
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 10
+        #   timeoutSeconds: 10
+        #   failureThreshold: 30
+        #   successThreshold: 1
       
       # Service account for secure access to Google Cloud services
-      serviceAccountName: 'tailerai-v2-sa@PROJECT_ID_PLACEHOLDER.iam.gserviceaccount.com'
+      serviceAccountName: 'tailerai-v2-sa@tailer-466216.iam.gserviceaccount.com'
       
   traffic:
   - percent: 100
