@@ -259,6 +259,7 @@ class DatasetManager {
                         </div>
                         <div class="item-actions">
                             <button class="btn-ghost btn-sm" onclick="editWorkExperience('${exp.id}')">Edit</button>
+                            <button class="btn-ghost btn-sm btn-primary" onclick="addAchievementToExperience('${exp.id}')">Add Achievement</button>
                             <button class="btn-ghost btn-sm text-red" onclick="deleteWorkExperience('${exp.id}')">Delete</button>
                         </div>
                     </div>
@@ -682,6 +683,10 @@ function addProject() {
 
 function addAchievement() {
     showAddAchievementModal();
+}
+
+function addAchievementToExperience(experienceId) {
+    showAddAchievementModal(experienceId);
 }
 
 function editWorkExperience(id) {
@@ -1770,6 +1775,13 @@ function showAddWorkExperienceModal() {
                         </div>
                         
                         <div class="form-group">
+                            <label for="job-description">Job Description</label>
+                            <textarea id="job-description" name="job_description" rows="4" 
+                                placeholder="Describe your role and responsibilities"></textarea>
+                            <small class="form-hint">Brief description of your role, key responsibilities, and the scope of your work.</small>
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="achievements">Achievements</label>
                             <textarea id="achievements" name="achievements" rows="6" 
                                 placeholder="• Achievement 1 with quantifiable results&#10;• Achievement 2 with impact metrics&#10;• Achievement 3 demonstrating skills"></textarea>
@@ -1853,7 +1865,7 @@ async function handleWorkExperienceSubmit(event) {
         for (let [key, value] of formData.entries()) {
             if (key !== 'is_current') {
                 // Always include job_description, department, and other text fields even if empty
-                if (key === 'job_description' || key === 'department' || key === 'company_description' || key === 'role_summary') {
+                if (key === 'job_description' || key === 'department' || key === 'company_description' || key === 'role_summary' || key === 'achievements') {
                     data[key] = value || '';
                 }
                 // Only include other fields if they have values
@@ -1876,6 +1888,34 @@ async function handleWorkExperienceSubmit(event) {
         
         // Add work experience via API
         const response = await window.api.createWorkExperience(data);
+        
+        // Process achievements if provided
+        if (data.achievements && data.achievements.trim()) {
+            const achievementLines = data.achievements.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .map(line => line.replace(/^[•\-\*]\s*/, '')); // Remove bullet points
+            
+            // Create individual achievement records
+            for (const achievementText of achievementLines) {
+                if (achievementText.length > 0) {
+                    try {
+                        const achievementData = {
+                            experience_id: response.id,
+                            achievement_text: achievementText,
+                            achievement_category: 'general',
+                            impact_level: 5,
+                            business_function: 'general',
+                            keywords: [],
+                            skills_demonstrated: []
+                        };
+                        await window.api.createAchievement(achievementData);
+                    } catch (achievementError) {
+                        console.warn('Failed to create achievement:', achievementError);
+                    }
+                }
+            }
+        }
         
         window.notifications.show('Work experience added successfully!', 'success');
         closeWorkExperienceModal();
@@ -2082,12 +2122,13 @@ async function handleAchievementSubmit(event) {
         
         const experienceId = formData.get('experience_id');
         
-        // Add achievement via API
-        if (experienceId) {
-            await window.api.createAchievement(data);
-        } else {
-            await window.api.createAchievement(data);
+        // Add experience_id to data if it exists
+        if (experienceId && experienceId.trim()) {
+            data.experience_id = experienceId;
         }
+        
+        // Add achievement via API
+        await window.api.createAchievement(data);
         
         window.notifications.show('Achievement added successfully!', 'success');
         closeAchievementModal();
