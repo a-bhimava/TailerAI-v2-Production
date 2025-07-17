@@ -1774,19 +1774,6 @@ function showAddWorkExperienceModal() {
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="job-description">Job Description</label>
-                            <textarea id="job-description" name="job_description" rows="4" 
-                                placeholder="Describe your role and responsibilities"></textarea>
-                            <small class="form-hint">Brief description of your role, key responsibilities, and the scope of your work.</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="achievements">Achievements</label>
-                            <textarea id="achievements" name="achievements" rows="6" 
-                                placeholder="• Achievement 1 with quantifiable results&#10;• Achievement 2 with impact metrics&#10;• Achievement 3 demonstrating skills"></textarea>
-                            <small class="form-hint">List your key achievements and accomplishments in this role. Use bullet points and include metrics where possible.</small>
-                        </div>
                         
                         <div class="form-actions">
                             <button type="button" class="btn btn-secondary" onclick="closeWorkExperienceModal()">
@@ -1863,15 +1850,8 @@ async function handleWorkExperienceSubmit(event) {
         
         // Convert form data to object
         for (let [key, value] of formData.entries()) {
-            if (key !== 'is_current') {
-                // Always include job_description, department, and other text fields even if empty
-                if (key === 'job_description' || key === 'department' || key === 'company_description' || key === 'role_summary' || key === 'achievements') {
-                    data[key] = value || '';
-                }
-                // Only include other fields if they have values
-                else if (value) {
-                    data[key] = value;
-                }
+            if (key !== 'is_current' && value) {
+                data[key] = value;
             }
         }
         
@@ -1888,34 +1868,6 @@ async function handleWorkExperienceSubmit(event) {
         
         // Add work experience via API
         const response = await window.api.createWorkExperience(data);
-        
-        // Process achievements if provided
-        if (data.achievements && data.achievements.trim()) {
-            const achievementLines = data.achievements.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0)
-                .map(line => line.replace(/^[•\-\*]\s*/, '')); // Remove bullet points
-            
-            // Create individual achievement records
-            for (const achievementText of achievementLines) {
-                if (achievementText.length > 0) {
-                    try {
-                        const achievementData = {
-                            experience_id: response.id,
-                            achievement_text: achievementText,
-                            achievement_category: 'general',
-                            impact_level: 5,
-                            business_function: 'general',
-                            keywords: [],
-                            skills_demonstrated: []
-                        };
-                        await window.api.createAchievement(achievementData);
-                    } catch (achievementError) {
-                        console.warn('Failed to create achievement:', achievementError);
-                    }
-                }
-            }
-        }
         
         window.notifications.show('Work experience added successfully!', 'success');
         closeWorkExperienceModal();
@@ -1974,72 +1926,9 @@ function showAddAchievementModal(experienceId = null) {
                         <input type="hidden" id="experience-id" name="experience_id" value="${experienceId || ''}">
                         
                         <div class="form-group">
-                            <label for="achievement-text">Achievement Description *</label>
-                            <textarea id="achievement-text" name="achievement_text" rows="4" required
-                                placeholder="Describe your achievement with specific, quantifiable results..."></textarea>
-                            <small class="form-hint">
-                                Use action verbs and include metrics (e.g., "Increased sales by 25% through...")
-                            </small>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="achievement-category">Category *</label>
-                                <select id="achievement-category" name="achievement_category" required>
-                                    <option value="">Select category</option>
-                                    <option value="leadership">Leadership</option>
-                                    <option value="technical">Technical</option>
-                                    <option value="financial">Financial</option>
-                                    <option value="operational">Operational</option>
-                                    <option value="strategic">Strategic</option>
-                                    <option value="customer">Customer-focused</option>
-                                    <option value="process">Process Improvement</option>
-                                    <option value="innovation">Innovation</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="impact-level">Impact Level (1-10) *</label>
-                                <select id="impact-level" name="impact_level" required>
-                                    <option value="">Select impact</option>
-                                    <option value="1">1 - Minor</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5 - Moderate</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10 - Major</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="business-function">Business Function</label>
-                            <input type="text" id="business-function" name="business_function" 
-                                placeholder="e.g., Sales, Marketing, Engineering">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="time-period">Time Period</label>
-                            <input type="text" id="time-period" name="time_period" 
-                                placeholder="e.g., Q3 2023, Over 6 months">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="keywords">Keywords (comma-separated)</label>
-                            <input type="text" id="keywords" name="keywords" 
-                                placeholder="leadership, project management, revenue growth">
-                            <small class="form-hint">
-                                Add relevant keywords that might appear in job descriptions
-                            </small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="skills-demonstrated">Skills Demonstrated (comma-separated)</label>
-                            <input type="text" id="skills-demonstrated" name="skills_demonstrated" 
-                                placeholder="Python, team leadership, data analysis">
+                            <label for="achievement-text">Achievement *</label>
+                            <textarea id="achievement-text" name="achievement_text" rows="3" required
+                                placeholder="Describe your achievement with quantifiable results (e.g., 'Increased sales by 25% through...')"></textarea>
                         </div>
                         
                         <div class="form-actions">
@@ -2100,25 +1989,15 @@ async function handleAchievementSubmit(event) {
         const formData = new FormData(form);
         const data = {};
         
-        // Convert form data to object
-        for (let [key, value] of formData.entries()) {
-            if (value && key !== 'experience_id') {
-                data[key] = value;
-            }
-        }
+        // Get the achievement text
+        data.achievement_text = formData.get('achievement_text');
         
-        // Parse arrays from comma-separated strings
-        if (data.keywords) {
-            data.keywords = data.keywords.split(',').map(k => k.trim()).filter(k => k);
-        }
-        if (data.skills_demonstrated) {
-            data.skills_demonstrated = data.skills_demonstrated.split(',').map(s => s.trim()).filter(s => s);
-        }
-        
-        // Convert impact level to number
-        if (data.impact_level) {
-            data.impact_level = parseInt(data.impact_level);
-        }
+        // Set sensible defaults for the simplified form
+        data.achievement_category = 'general';
+        data.impact_level = 5;
+        data.business_function = 'general';
+        data.keywords = [];
+        data.skills_demonstrated = [];
         
         const experienceId = formData.get('experience_id');
         
