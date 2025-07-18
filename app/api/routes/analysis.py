@@ -10,12 +10,15 @@ from pydantic import BaseModel
 
 from app.config.settings import get_settings
 from app.services.job_analysis_service import job_analyzer, JobDescriptionAnalysisError
-from app.services.content_selection_service import content_selector, ContentSelectionError
+from app.services.ai_content_selection_service import AIContentSelectionEngine, ContentSelectionError
 from app.api.dependencies.auth_deps import get_current_active_user
 from app.models.database import User
 
 router = APIRouter()
 settings = get_settings()
+
+# Initialize AI-enhanced content selector
+ai_content_selector = AIContentSelectionEngine(use_ai_selection=True)
 
 
 class JobAnalysisRequest(BaseModel):
@@ -324,8 +327,8 @@ async def select_optimal_content(
         # Get user profile ID
         user_profile_id = str(current_user.id)
         
-        # Perform content selection
-        selection_result = await content_selector.select_optimal_content(
+        # Perform AI-enhanced content selection
+        selection_result = await ai_content_selector.select_optimal_content(
             user_profile_id=user_profile_id,
             job_analysis=job_analysis
         )
@@ -381,7 +384,7 @@ async def get_content_selection_statistics(
     Get statistics about content selection usage and performance.
     """
     try:
-        stats = content_selector.get_selection_stats()
+        stats = ai_content_selector.get_selection_stats()
         return {
             "success": True,
             "statistics": stats
@@ -410,9 +413,9 @@ async def perform_full_analysis(
             job_url=request.job_url
         )
         
-        # Step 2: Select optimal content
+        # Step 2: Select optimal content using AI-enhanced selector
         user_profile_id = str(current_user.id)
-        selection_result = await content_selector.select_optimal_content(
+        selection_result = await ai_content_selector.select_optimal_content(
             user_profile_id=user_profile_id,
             job_analysis=job_analysis_result
         )

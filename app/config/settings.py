@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
     
     # Enhanced AI Content Selection settings
-    enable_ai_content_selection: bool = Field(default=False, env="ENABLE_AI_CONTENT_SELECTION")
+    enable_ai_content_selection: bool = Field(default=True, env="ENABLE_AI_CONTENT_SELECTION")
     ai_selection_fallback_enabled: bool = Field(default=True, env="AI_SELECTION_FALLBACK_ENABLED")
     ai_selection_confidence_threshold: float = Field(default=0.7, env="AI_SELECTION_CONFIDENCE_THRESHOLD")
     ai_selection_default_method: str = Field(default="ai_enhanced", env="AI_SELECTION_DEFAULT_METHOD")

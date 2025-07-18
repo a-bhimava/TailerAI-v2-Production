@@ -19,6 +19,8 @@ from app.api.dependencies.auth_deps import get_current_user
 from app.services.latex_generation_service import latex_generation_service, LaTeXGenerationError
 from app.services.database_service import db_service
 from app.services.content_selection_service import content_selector
+from app.services.ai_content_selection_service import ai_content_selector
+from app.services.job_analysis_service import job_analyzer
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v2/latex", tags=["latex-generation"])
@@ -250,18 +252,75 @@ async def generate_optimized_resume(
         from datetime import datetime
         start_time = datetime.now()
         
-        # Get selected content from content selection service
-        selected_content = await content_selector.get_selected_content_for_job(
-            user_id=str(current_user.id),
-            job_analysis_id=request.job_analysis_id,
-            manual_overrides=request.manual_overrides
-        )
-        
-        if not selected_content:
+        # Get job analysis first
+        job_analysis = job_analyzer._get_cached_analysis(request.job_analysis_id)
+        if not job_analysis:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="No content selection found for the provided job analysis ID"
+                detail="Job analysis not found"
             )
+        
+        # Get selected content using AI-enhanced content selection
+        selection_result = await ai_content_selector.select_optimal_content(
+            user_profile_id=str(current_user.id),
+            job_analysis=job_analysis
+        )
+        
+        # Convert selection result to format expected by LaTeX service
+        selected_content = {
+            'work_experiences': [],
+            'education': [],
+            'skills': [],
+            'projects': [],
+            'certifications': [],
+            'achievements': []
+        }
+        
+        # Process selected achievements
+        for achievement_item in selection_result.selected_achievements:
+            selected_content['achievements'].append(achievement_item.content_data)
+        
+        # Process selected skills
+        for skill_item in selection_result.selected_skills:
+            selected_content['skills'].append(skill_item.content_data)
+        
+        # Process selected work experiences
+        for work_exp_item in selection_result.selected_work_experiences:
+            selected_content['work_experiences'].append(work_exp_item.content_data)
+        
+        # Process selected education
+        for edu_item in selection_result.selected_education:
+            selected_content['education'].append(edu_item.content_data)
+        
+        # Process selected projects
+        for project_item in selection_result.selected_projects:
+            selected_content['projects'].append(project_item.content_data)
+        
+        if not any(selected_content.values()):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No content was selected for the provided job analysis ID"
+            )
+        
+        # Log AI selection results
+        logger.info(f"AI-enhanced content selection completed for user {current_user.id}")
+        logger.info(f"Selection method: {selection_result.selection_method}")
+        logger.info(f"Total score: {selection_result.total_score}")
+        logger.info(f"Word count: {selection_result.estimated_word_count}")
+        logger.info(f"Keyword coverage: {selection_result.keyword_coverage_percentage}%")
+        logger.info(f"Achievements: {len(selection_result.selected_achievements)}")
+        logger.info(f"Skills: {len(selection_result.selected_skills)}")
+        logger.info(f"Work experiences: {len(selection_result.selected_work_experiences)}")
+        logger.info(f"AI fallback applied: {selection_result.fallback_applied}")
+        
+        if selection_result.ai_reasoning:
+            logger.info(f"AI reasoning confidence: {selection_result.ai_reasoning.confidence_score}")
+            logger.info(f"AI selection rationale: {selection_result.ai_reasoning.selection_rationale}")
+        
+        # Apply manual overrides if provided
+        if request.manual_overrides:
+            logger.info(f"Applying manual overrides: {request.manual_overrides}")
+            # TODO: Implement manual override logic if needed
         
         # Generate PDF with optimized content
         success, pdf_path, message = await latex_generation_service.generate_resume_pdf(
@@ -285,9 +344,10 @@ async def generate_optimized_resume(
             
             logger.info(f"Optimized resume generated for user {current_user.id}, job analysis {request.job_analysis_id}")
             
+            ai_method_info = f" (AI method: {selection_result.selection_method})" if selection_result else ""
             return GenerateResumeResponse(
                 success=True,
-                message="Optimized resume generated successfully",
+                message=f"AI-optimized resume generated successfully{ai_method_info}",
                 pdf_download_url=download_url,
                 generation_id=filename.replace('.pdf', ''),
                 processing_time_ms=processing_time
