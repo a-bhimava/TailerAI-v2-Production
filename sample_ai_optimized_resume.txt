@@ -1,0 +1,32 @@
+ALEX JOHNSON
++1-555-123-4567 | alex.johnson@email.com | linkedin.com/in/alexjohnson | San Francisco, CA
+_______________________________________________________________________________
+
+EDUCATION
+
+STANFORD UNIVERSITY                                                Stanford, CA
+Master of Science, Computer Science                                      05/19
+GPA: 3.8/4.0 | Dean's List, Research Assistant
+
+UC BERKELEY                                                          Berkeley, CA  
+Bachelor of Science, Computer Science                                    05/17
+GPA: 3.7/4.0 | Magna Cum Laude, Computer Science Honor Society
+
+WORK EXPERIENCE
+
+TECHCORP INC.                                                    San Francisco, CA
+Senior Software Engineer                                          01/22 - Present
+• Led development of microservices architecture serving 10M+ users, reducing API response time by 40%
+• Implemented CI/CD pipeline using Jenkins and Docker, reducing deployment time from 2 hours to 15 minutes
+• Designed and built real-time data processing system using Apache Kafka, processing 1M+ events per day
+• Mentored 5 junior developers, improving team productivity by 30% and reducing code review time by 50%
+
+DATASOLUTIONS LTD.                                               San Francisco, CA
+Software Engineer                                                 06/19 - 12/21
+• Built machine learning model for fraud detection, achieving 95% accuracy and saving $2M annually
+• Developed automated testing framework, increasing test coverage from 40% to 95% and reducing bugs by 70%
+
+TECHNICAL SKILLS
+
+Programming: Python, JavaScript; Backend: Node.js; DevOps: Docker, Kubernetes, Jenkins; 
+Cloud: AWS; Database: PostgreSQL, Redis; Data: Apache Kafka; Architecture: System Design
