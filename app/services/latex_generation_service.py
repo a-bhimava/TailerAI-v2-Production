@@ -327,20 +327,39 @@ class LaTeXGenerationService:
             linkedin_url = self._escape_latex_characters(user_profile.linkedin_url or "")
             location = self._escape_latex_characters(user_profile.location or "")
             
-            # Build header
+            # Build header with improved logging and fallback handling
             header_parts = []
-            if phone:
-                header_parts.append(phone)
+            
+            # Always include email as primary contact
             if email:
                 header_parts.append(email)
+                self.logger.info(f"Added email to header: {email}")
+            else:
+                self.logger.warning("No email found in user profile - this should not happen")
+            
+            # Add other contact information if available
+            if phone:
+                header_parts.append(phone)
+                self.logger.info(f"Added phone to header: {phone}")
+            else:
+                self.logger.info("No phone number provided - skipping")
+                
             if linkedin_url:
                 # Extract just the username part from LinkedIn URL
                 linkedin_display = linkedin_url.replace("https://", "").replace("http://", "")
                 header_parts.append(linkedin_display)
+                self.logger.info(f"Added LinkedIn to header: {linkedin_display}")
+            else:
+                self.logger.info("No LinkedIn URL provided - skipping")
+                
             if location:
                 header_parts.append(location)
+                self.logger.info(f"Added location to header: {location}")
+            else:
+                self.logger.info("No location provided - skipping")
             
             header_line = " $|$ ".join(header_parts)
+            self.logger.info(f"Final header line: '{header_line}' (parts: {len(header_parts)})")
             
             # Build education section
             education_content = ""

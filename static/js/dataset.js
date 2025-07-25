@@ -524,7 +524,7 @@ class DatasetManager {
 
         // Basic profile completion
         const profile = this.dataset.profile || {};
-        const profileFields = ['full_name', 'email', 'phone', 'location'];
+        const profileFields = ['full_name', 'email', 'phone', 'linkedin_url', 'location'];
         totalFields += profileFields.length;
         completedFields += profileFields.filter(field => profile[field]).length;
 

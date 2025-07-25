@@ -18,6 +18,7 @@ from app.models.database import (
     Skill, Project, JobAnalysis, ContentSelection
 )
 from app.services.database_service import db_service, DatabaseError
+from app.services.achievement_categorization_service import get_categorization_service
 
 logger = logging.getLogger(__name__)
 
@@ -414,14 +415,43 @@ class MasterDatasetService:
                 if not work_experience:
                     raise MasterDatasetError(f"Work experience not found: {experience_id}")
                 
-                # Create achievement
+                # Get achievement text and context for categorization
+                achievement_text = achievement_data.get('achievement_text', '')
+                work_context = f"{work_experience.position} at {work_experience.company_name}"
+                
+                # Auto-categorize achievement if not provided
+                provided_category = achievement_data.get('achievement_category', '')
+                provided_function = achievement_data.get('business_function', '')
+                
+                if not provided_category or not provided_function:
+                    try:
+                        categorization_service = get_categorization_service()
+                        category, business_function, confidence = await categorization_service.categorize_achievement(
+                            achievement_text, work_context
+                        )
+                        
+                        # Use provided values if available, otherwise use AI categorization
+                        final_category = provided_category if provided_category else category
+                        final_function = provided_function if provided_function else business_function
+                        
+                        self.logger.info(f"Auto-categorized achievement: {final_category}/{final_function} (confidence: {confidence})")
+                        
+                    except Exception as e:
+                        self.logger.warning(f"Auto-categorization failed, using defaults: {e}")
+                        final_category = provided_category if provided_category else 'operational'
+                        final_function = provided_function if provided_function else 'general'
+                else:
+                    final_category = provided_category
+                    final_function = provided_function
+                
+                # Create achievement with categorization
                 achievement = Achievement(
                     profile_id=user_profile.id,
                     experience_id=experience_id,
-                    achievement_text=achievement_data.get('achievement_text', ''),
-                    achievement_category=achievement_data.get('achievement_category', ''),
+                    achievement_text=achievement_text,
+                    achievement_category=final_category,
                     impact_level=achievement_data.get('impact_level', 5),
-                    business_function=achievement_data.get('business_function', ''),
+                    business_function=final_function,
                     quantified_metrics=achievement_data.get('quantified_metrics', {}),
                     keywords=achievement_data.get('keywords', []),
                     ats_keywords=achievement_data.get('ats_keywords', []),
